@@ -3147,7 +3147,6 @@
         dealer_net: null,
         dias_no_patio: null,
         data_et: null,
-        flag: 'Em andamento',
         data_programacao_pdi: null,
         created_at: new Date().toISOString()
     };
@@ -3169,7 +3168,7 @@
         const allowedColumns = [
             'revenda','n_pedido','serie','data_venda','cliente','qtde','modelo','nf_jcb','localizacao',
             'status_pgto','ano','retirada_fab','prev_chegada','chegada_patio','dias_fat_fab','r_frete','fat_fab',
-            'flag','created_at'
+            'created_at'
         ];
         const payload = sanitizePayload(formData, allowedColumns);
 
