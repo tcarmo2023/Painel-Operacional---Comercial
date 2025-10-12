@@ -1544,6 +1544,7 @@
                         <div class="tab active" data-tab="estoque">Estoque</div>
                         <div class="tab" data-tab="pedidos">Pedidos JCB</div>
                         <div class="tab" data-tab="vendas">Vendas</div>
+                        <div class="tab" data-tab="ajuste-status">Ajuste Status</div>
                         <div class="tab" data-tab="registros">Novos Registros</div>
                     </div>
 
@@ -1564,11 +1565,10 @@
                                     <label for="flagFilter">Flag</label>
                                     <select id="flagFilter" class="form-control">
                                         <option value="">Todos</option>
-                                        <option value="Faturado">Faturado</option>
-                                        <option value="Em andamento">Em andamento</option>
-                                        <option value="Em trânsito">Em trânsito</option>
+                                        <option value="Em Trânsito">Em Trânsito</option>
+                                        <option value="Estoque">Estoque</option>
+                                        <option value="Entrega ao Cliente">Entrega ao Cliente</option>
                                         <option value="Máquina no Pátio">Máquina no Pátio</option>
-                                        <option value="Entregue ao cliente">Entregue ao cliente</option>
                                     </select>
                                 </div>
                                 <div class="filter-group">
@@ -1632,7 +1632,7 @@
                                     <thead>
                                         <tr>
                                             <th data-sort="revenda">Revenda <i class="fas fa-sort"></i></th>
-                                            <th data-sort="n_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
+                                            <th data-sort="numero_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
                                             <th data-sort="pdi">Status PDI <i class="fas fa-sort"></i></th>
                                             <th data-sort="status_entrega">Status Entrega Técnica <i class="fas fa-sort"></i></th>
                                             <th data-sort="cliente">Cliente <i class="fas fa-sort"></i></th>
@@ -1640,7 +1640,7 @@
                                             <th data-sort="modelo">Modelo <i class="fas fa-sort"></i></th>
                                             <th data-sort="localizacao">Localização <i class="fas fa-sort"></i></th>
                                             <th data-sort="dias_fat_fab">Dias Fat. Fábrica <i class="fas fa-sort"></i></th>
-                                            <th data-sort="status_pgto">Status Pagamento <i class="fas fa-sort"></i></th>
+                                            <th data-sort="status_pagamento">Status Pagamento <i class="fas fa-sort"></i></th>
                                             <th data-sort="ano">Ano <i class="fas fa-sort"></i></th>
                                             <th data-sort="prev_chegada">Previsão Chegada <i class="fas fa-sort"></i></th>
                                             <th data-sort="chegada_patio">Chegada Pátio <i class="fas fa-sort"></i></th>
@@ -1726,7 +1726,7 @@
                                 <table id="pedidosTable">
                                     <thead>
                                         <tr>
-                                            <th data-sort="n_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
+                                            <th data-sort="numero_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
                                             <th data-sort="modelo">Modelo <i class="fas fa-sort"></i></th>
                                             <th data-sort="entrega">Entrega <i class="fas fa-sort"></i></th>
                                             <th data-sort="uf">UF <i class="fas fa-sort"></i></th>
@@ -1810,14 +1810,14 @@
                                     <thead>
                                         <tr>
                                             <th data-sort="revenda">Revenda <i class="fas fa-sort"></i></th>
-                                            <th data-sort="n_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
+                                            <th data-sort="numero_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
                                             <th data-sort="serie">Série <i class="fas fa-sort"></i></th>
                                             <th data-sort="data_venda">Data Venda <i class="fas fa-sort"></i></th>
                                             <th data-sort="cliente">Cliente <i class="fas fa-sort"></i></th>
                                             <th data-sort="modelo">Modelo <i class="fas fa-sort"></i></th>
                                             <th data-sort="localizacao">Localização <i class="fas fa-sort"></i></th>
                                             <th data-sort="venda">Venda <i class="fas fa-sort"></i></th>
-                                            <th data-sort="status_pgto">Status PGTO <i class="fas fa-sort"></i></th>
+                                            <th data-sort="status_pagamento">Status Pagamento <i class="fas fa-sort"></i></th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
@@ -1837,6 +1837,72 @@
                         </div>
                     </div>
 
+                    <!-- Ajuste Status Tab -->
+                    <div id="ajuste-statusTab" class="tab-content" style="display: none;">
+                        <div class="admin-panel">
+                            <h3><i class="fas fa-exchange-alt"></i> Ajuste de Status do Estoque</h3>
+                            <div class="filters">
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label for="ajusteNumeroPedido">Nº Pedido</label>
+                                        <input type="text" id="ajusteNumeroPedido" class="form-control" placeholder="Informe o Nº Pedido">
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="ajusteSerie">Série</label>
+                                        <input type="text" id="ajusteSerie" class="form-control" placeholder="Informe a Série">
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="btn" id="buscarAjusteBtn"><i class="fas fa-search"></i> Buscar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <form id="ajusteStatusForm" style="display:none; margin-top: 12px;">
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label>Revenda</label>
+                                        <input type="text" id="ajusteRevenda" class="form-control" disabled>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label>Nº Pedido</label>
+                                        <input type="text" id="ajusteNPedido" class="form-control" disabled>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label>Série</label>
+                                        <input type="text" id="ajusteSerieView" class="form-control" disabled>
+                                    </div>
+                                </div>
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label for="ajusteLocalizacao">Localização</label>
+                                        <select id="ajusteLocalizacao" class="form-control">
+                                            <option value="">Selecione</option>
+                                            <option value="Em Trânsito">Em Trânsito</option>
+                                            <option value="Máquina no Pátio">Máquina no Pátio</option>
+                                            <option value="Cliente">Cliente</option>
+                                            <option value="Estoque">Estoque</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="ajusteStatusMaq">Status Maq.</label>
+                                        <select id="ajusteStatusMaq" class="form-control">
+                                            <option value="">Selecione</option>
+                                            <option value="Em Trânsito">Em Trânsito</option>
+                                            <option value="Estoque">Estoque</option>
+                                            <option value="Entrega ao Cliente">Entrega ao Cliente</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="ajusteCliente">Cliente</label>
+                                        <input type="text" id="ajusteCliente" class="form-control" placeholder="Nome do Cliente">
+                                    </div>
+                                </div>
+                                <div class="filter-actions">
+                                    <button type="button" class="btn btn-success" id="salvarAjusteBtn"><i class="fas fa-save"></i> Salvar</button>
+                                </div>
+                                <small class="text-muted">Ao salvar: se Localização = "Máquina no Pátio", cria registro no PDI; se Status Maq. = "Entrega ao Cliente", cria registro na Entrega Técnica (Pendente).</small>
+                            </form>
+                        </div>
+                    </div>
                     <!-- NOVA ABA: Registros -->
                     <div id="registrosTab" class="tab-content" style="display: none;">
                         <div class="admin-panel">
@@ -1916,6 +1982,10 @@
                                         <input type="text" id="estoque_nf_jcb" class="form-control">
                                     </div>
                                     <div class="form-group">
+                                        <label for="estoque_dealer_net">Dealer Net</label>
+                                        <input type="number" id="estoque_dealer_net" class="form-control" step="0.01">
+                                    </div>
+                                    <div class="form-group">
                                         <label for="estoque_localizacao">Localização</label>
                                         <input type="text" id="estoque_localizacao" class="form-control">
                                     </div>
@@ -1959,6 +2029,28 @@
                                     <div class="form-group">
                                         <label for="estoque_fat_fab">Data Faturado pela Fábrica</label>
                                         <input type="date" id="estoque_fat_fab" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="estoque_status_pdi">Status PDI</label>
+                                        <select id="estoque_status_pdi" class="form-control">
+                                            <option value="Não">Não</option>
+                                            <option value="Sim">Sim</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="estoque_status_entrega">Status Entrega Técnica</label>
+                                        <select id="estoque_status_entrega" class="form-control">
+                                            <option value="Pendente">Pendente</option>
+                                            <option value="Feito">Feito</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="estoque_status_maq">Status Maq.</label>
+                                        <select id="estoque_status_maq" class="form-control">
+                                            <option value="Em Trânsito">Em Trânsito</option>
+                                            <option value="Estoque">Estoque</option>
+                                            <option value="Entrega ao Cliente">Entrega ao Cliente</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-actions">
@@ -2179,7 +2271,7 @@
                                 <table id="pdiTable">
                                     <thead>
                                         <tr>
-                                            <th data-sort="n_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
+                                            <th data-sort="numero_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
                                             <th data-sort="serie">Série <i class="fas fa-sort"></i></th>
                                             <th data-sort="cliente">Cliente <i class="fas fa-sort"></i></th>
                                             <th data-sort="revenda">Revenda <i class="fas fa-sort"></i></th>
@@ -2265,7 +2357,7 @@
                                 <table id="entregaTecnicaTable">
                                     <thead>
                                         <tr>
-                                            <th data-sort="n_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
+                                            <th data-sort="numero_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
                                             <th data-sort="serie">Série <i class="fas fa-sort"></i></th>
                                             <th data-sort="cliente">Cliente <i class="fas fa-sort"></i></th>
                                             <th data-sort="revenda">Revenda <i class="fas fa-sort"></i></th>
@@ -2554,14 +2646,12 @@
                     <input type="hidden" id="flagNroPedido">
                     <input type="hidden" id="flagSerie">
                     <div class="form-group">
-                        <label for="novaFlag">Novo Status</label>
-                        <select id="novaFlag" class="form-control" required>
-                            <option value="Faturado">Faturado</option>
-                            <option value="Em andamento">Em andamento</option>
-                            <option value="Em trânsito">Em trânsito</option>
-                            <option value="Máquina no Pátio">Máquina no Pátio</option>
-                            <option value="Entregue ao cliente">Entregue ao cliente</option>
-                        </select>
+                    <label for="novaFlag">Status Maq.</label>
+                    <select id="novaFlag" class="form-control" required>
+                        <option value="Em Trânsito">Em Trânsito</option>
+                        <option value="Estoque">Estoque</option>
+                        <option value="Entrega ao Cliente">Entrega ao Cliente</option>
+                    </select>
                     </div>
                 <div class="form-group">
                     <label for="novaLocalizacao">Localização</label>
@@ -2597,11 +2687,11 @@
             users: [],
             currentRecordType: 'estoque',
             tables: {
-                estoque: { data: [], page: 1, limit: 10, total: 0, sortBy: 'n_pedido', sortOrder: 'asc', filters: {} },
-                pedidos_jcb: { data: [], page: 1, limit: 10, total: 0, sortBy: 'n_pedido', sortOrder: 'asc', filters: {} },
-                vendas: { data: [], page: 1, limit: 10, total: 0, sortBy: 'n_pedido', sortOrder: 'asc', filters: {} },
-                pdi: { data: [], page: 1, limit: 10, total: 0, sortBy: 'n_pedido', sortOrder: 'asc', filters: {} },
-                entrega_tecnica: { data: [], page: 1, limit: 10, total: 0, sortBy: 'n_pedido', sortOrder: 'asc', filters: {} }
+                estoque: { data: [], page: 1, limit: 10, total: 0, sortBy: 'numero_pedido', sortOrder: 'asc', filters: {} },
+                pedidos_jcb: { data: [], page: 1, limit: 10, total: 0, sortBy: 'numero_pedido', sortOrder: 'asc', filters: {} },
+                vendas: { data: [], page: 1, limit: 10, total: 0, sortBy: 'numero_pedido', sortOrder: 'asc', filters: {} },
+                pdi: { data: [], page: 1, limit: 10, total: 0, sortBy: 'numero_pedido', sortOrder: 'asc', filters: {} },
+                entrega_tecnica: { data: [], page: 1, limit: 10, total: 0, sortBy: 'numero_pedido', sortOrder: 'asc', filters: {} }
             }
         };
 
@@ -2716,6 +2806,11 @@
                     switchTab(this.dataset.tab);
                 });
             });
+            // Ajuste Status actions
+            const buscarBtn = document.getElementById('buscarAjusteBtn');
+            const salvarAjusteBtn = document.getElementById('salvarAjusteBtn');
+            if (buscarBtn) buscarBtn.addEventListener('click', buscarAjusteStatus);
+            if (salvarAjusteBtn) salvarAjusteBtn.addEventListener('click', salvarAjusteStatus);
             
             // Admin
             elements.addUserForm.addEventListener('submit', handleAddUser);
@@ -3157,6 +3252,7 @@
             if (appState.tables[tab] && appState.tables[tab].data.length === 0) {
                 loadTableData(tab);
             }
+            // Não carregar dados para aba de ajuste
             
             // Carregar dados específicos para PDI
             if (tab === 'pdi') {
@@ -3171,6 +3267,66 @@
             // Carregar configurações quando acessar a aba
             if (tab === 'configuracoes') {
                 loadNotificationConfigs();
+            }
+        }
+
+        async function buscarAjusteStatus() {
+            const nPedido = document.getElementById('ajusteNumeroPedido').value.trim();
+            const serie = document.getElementById('ajusteSerie').value.trim();
+            if (!nPedido || !serie) { showToast('Informe Nº Pedido e Série.', 'error'); return; }
+            showLoading(true);
+            try {
+                const resp = await fetch(`${SUPABASE_URL}/rest/v1/estoque?numero_pedido=eq.${encodeURIComponent(nPedido)}&serie=eq.${encodeURIComponent(serie)}`, {
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                const rows = resp.ok ? await resp.json() : [];
+                if (rows.length === 0) { showToast('Registro não encontrado.', 'warning'); return; }
+                const it = rows[0];
+                document.getElementById('ajusteStatusForm').style.display = 'block';
+                document.getElementById('ajusteRevenda').value = it.revenda || '';
+                document.getElementById('ajusteNPedido').value = it.numero_pedido || '';
+                document.getElementById('ajusteSerieView').value = it.serie || '';
+                document.getElementById('ajusteLocalizacao').value = it.localizacao || '';
+                document.getElementById('ajusteStatusMaq').value = it.status_maq || '';
+                document.getElementById('ajusteCliente').value = it.cliente || '';
+            } catch (e) {
+                showToast('Erro ao buscar registro.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function salvarAjusteStatus() {
+            const nPedido = document.getElementById('ajusteNPedido').value;
+            const serie = document.getElementById('ajusteSerieView').value;
+            const localizacao = document.getElementById('ajusteLocalizacao').value;
+            const statusMaq = document.getElementById('ajusteStatusMaq').value;
+            const cliente = document.getElementById('ajusteCliente').value || null;
+            if (!nPedido || !serie) { showToast('Busque um registro primeiro.', 'error'); return; }
+            showLoading(true);
+            try {
+                // Atualizar estoque
+                const upd = await fetch(`${SUPABASE_URL}/rest/v1/estoque?numero_pedido=eq.${encodeURIComponent(nPedido)}&serie=eq.${encodeURIComponent(serie)}`, {
+                    method: 'PATCH',
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ localizacao, status_maq: statusMaq, cliente })
+                });
+                if (!upd.ok) throw new Error('Falha ao salvar estoque');
+
+                // Regras de migração
+                if (localizacao === 'Máquina no Pátio') {
+                    await migrateToPDI(nPedido, serie);
+                }
+                if (statusMaq === 'Entrega ao Cliente') {
+                    await migrateToEntregaTecnica(nPedido, serie);
+                }
+
+                showToast('Ajuste salvo!', 'success');
+                loadTableData('estoque');
+            } catch (e) {
+                showToast('Erro ao salvar ajuste.', 'error');
+            } finally {
+                showLoading(false);
             }
         }
 
@@ -3201,41 +3357,35 @@
     // Coletar dados do formulário COM OS NOMES CORRETOS
     const formData = {
         revenda: document.getElementById('estoque_revenda').value,
-        n_pedido: document.getElementById('estoque_n_pedido').value.trim(),
+        numero_pedido: document.getElementById('estoque_n_pedido').value.trim(),
         serie: document.getElementById('estoque_serie').value.trim(),
-        data_venda: document.getElementById('estoque_data_venda').value || null,
+        faturado_fabrica: document.getElementById('estoque_fat_fab').value || null,
         cliente: document.getElementById('estoque_cliente').value.trim() || null,
         qtde: parseInt(document.getElementById('estoque_qtde').value) || 1,
         modelo: document.getElementById('estoque_modelo').value.trim() || null,
         nf_jcb: document.getElementById('estoque_nf_jcb').value.trim() || null,
         localizacao: document.getElementById('estoque_localizacao').value.trim() || null,
-        // CORREÇÃO: Nome correto da coluna
-        frete_sao_paulo_recife_fortaleza: document.getElementById('estoque_frete').value ? 
-            parseFloat(document.getElementById('estoque_frete').value) : null,
-        status_pgto: document.getElementById('estoque_status_pgto').value || null,
-        ano: document.getElementById('estoque_ano').value ? 
-            parseInt(document.getElementById('estoque_ano').value) : null,
-        retirada_fab: document.getElementById('estoque_retirada_fab').value || null,
-        prev_chegada: document.getElementById('estoque_prev_chegada').value || null,
+        dias_faturado_fabrica: document.getElementById('estoque_dias_fat_fab').value.trim() || null,
+        frete: document.getElementById('estoque_frete').value ? parseFloat(document.getElementById('estoque_frete').value) : null,
+        dealer_net: document.getElementById('estoque_dealer_net').value ? parseFloat(document.getElementById('estoque_dealer_net').value) : null,
+        status_pagamento: document.getElementById('estoque_status_pgto').value || null,
+        ano: document.getElementById('estoque_ano').value ? parseInt(document.getElementById('estoque_ano').value) : null,
+        data_retirada_fabrica: document.getElementById('estoque_retirada_fab').value || null,
+        previsao_chegada: document.getElementById('estoque_prev_chegada').value || null,
         chegada_patio: document.getElementById('estoque_chegada_patio').value || null,
-        dias_fat_fab: document.getElementById('estoque_dias_fat_fab').value.trim() || null,
-        r_frete: document.getElementById('estoque_r_frete').value ? 
-            parseFloat(document.getElementById('estoque_r_frete').value) : null,
-        fat_fab: document.getElementById('estoque_fat_fab').value || null,
-        // Campos adicionais com valores padrão
-        qtde_dias_patio: null,
-        dealer_net: null,
         dias_no_patio: null,
+        data_venda: document.getElementById('estoque_data_venda').value || null,
         data_et: null,
-        flag: 'Em andamento',
-        data_programacao_pdi: null,
+        status_pdi: document.getElementById('estoque_status_pdi').value || 'Não',
+        status_entrega_tecnica: document.getElementById('estoque_status_entrega').value || 'Pendente',
+        status_maq: document.getElementById('estoque_status_maq').value || 'Em Trânsito',
         created_at: new Date().toISOString()
     };
     
     console.log('Dados do formulário (corrigidos):', formData);
     
     // Validações básicas
-    if (!formData.revenda || !formData.n_pedido || !formData.serie) {
+    if (!formData.revenda || !formData.numero_pedido || !formData.serie) {
         showToast('Preencha os campos obrigatórios: Revenda, Nº Pedido e Série.', 'error');
         return;
     }
@@ -3290,9 +3440,9 @@
     console.log('Iniciando cadastro de venda...');
     
     // Coletar dados do formulário COM OS NOMES CORRETOS
-    const formData = {
+        const formData = {
         revenda: document.getElementById('venda_revenda').value,
-        n_pedido: document.getElementById('venda_n_pedido').value.trim(),
+        numero_pedido: document.getElementById('venda_n_pedido').value.trim(),
         serie: document.getElementById('venda_serie').value.trim(),
         data_venda: document.getElementById('venda_data_venda').value || null,
         cliente: document.getElementById('venda_cliente').value.trim() || null,
@@ -3300,22 +3450,18 @@
         modelo: document.getElementById('venda_modelo').value.trim() || null,
         nf_jcb: document.getElementById('venda_nf_jcb').value.trim() || null,
         localizacao: document.getElementById('venda_localizacao').value.trim() || null,
-        // CORREÇÃO: Nome correto da coluna
-        frete_sao_paulo_recife_fortaleza: document.getElementById('venda_frete').value ? 
+        frete_sp_pe_ce: document.getElementById('venda_frete').value ? 
             parseFloat(document.getElementById('venda_frete').value) : null,
         venda: document.getElementById('venda_venda').value ? 
             parseFloat(document.getElementById('venda_venda').value) : null,
-        status_pgto: document.getElementById('venda_status_pgto').value || null,
-        // Campos adicionais com valores padrão
-        qtde_dias_patio: null,
-        flag: 'Vendido',
+        status_pagamento: document.getElementById('venda_status_pgto').value || null,
         created_at: new Date().toISOString()
     };
     
     console.log('Dados do formulário vendas:', formData);
     
     // Validações básicas
-    if (!formData.revenda || !formData.n_pedido || !formData.serie) {
+    if (!formData.revenda || !formData.numero_pedido || !formData.serie) {
         showToast('Preencha os campos obrigatórios: Revenda, Nº Pedido e Série.', 'error');
         return;
     }
@@ -3370,7 +3516,7 @@
     
     // Coletar dados do formulário COM OS NOMES CORRETOS
     const formData = {
-        n_pedido: document.getElementById('pedido_n_pedido').value.trim(),
+        numero_pedido: document.getElementById('pedido_n_pedido').value.trim(),
         modelo: document.getElementById('pedido_modelo').value.trim(),
         // CORREÇÃO: Nome correto da coluna (entrega)
         entrega: document.getElementById('pedido_entrega').value,
@@ -3386,7 +3532,7 @@
     console.log('Dados do formulário pedidos JCB:', formData);
     
     // Validações básicas
-    if (!formData.n_pedido || !formData.modelo || !formData.entrega || !formData.revenda || !formData.status || !formData.ano) {
+    if (!formData.numero_pedido || !formData.modelo || !formData.entrega || !formData.revenda || !formData.status || !formData.ano) {
         showToast('Preencha todos os campos obrigatórios.', 'error');
         return;
     }
@@ -3462,7 +3608,7 @@
                 if (novaFlag === 'Entregue ao cliente') {
                     // Buscar dados do estoque para verificar PDI
                     const response = await fetch(
-                        `${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nroPedido}&serie=eq.${serie}`,
+                        `${SUPABASE_URL}/rest/v1/estoque?numero_pedido=eq.${nroPedido}&serie=eq.${serie}`,
                         {
                             headers: {
                                 'apikey': SUPABASE_ANON_KEY,
@@ -3488,7 +3634,7 @@
                     
                     // Se PDI está "Sim", atualizar flag e migrar para entrega técnica
                     const updateResponse = await fetch(
-                        `${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nroPedido}&serie=eq.${serie}`,
+                        `${SUPABASE_URL}/rest/v1/estoque?numero_pedido=eq.${nroPedido}&serie=eq.${serie}`,
                         {
                             method: 'PATCH',
                             headers: {
@@ -3497,7 +3643,7 @@
                                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                             },
                             body: JSON.stringify({ 
-                                flag: novaFlag,
+                                status_maq: novaFlag,
                                 data_et: new Date().toISOString().split('T')[0],
                                 localizacao: document.getElementById('novaLocalizacao').value || null,
                                 cliente: document.getElementById('novoCliente').value || null
@@ -3516,7 +3662,7 @@
                 } else if (novaFlag === 'Máquina no Pátio') {
                     // Atualizar flag e migrar para PDI
                     const updateResponse = await fetch(
-                        `${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nroPedido}&serie=eq.${serie}`,
+                        `${SUPABASE_URL}/rest/v1/estoque?numero_pedido=eq.${nroPedido}&serie=eq.${serie}`,
                         {
                             method: 'PATCH',
                             headers: {
@@ -3525,7 +3671,7 @@
                                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                             },
                             body: JSON.stringify({ 
-                                flag: novaFlag,
+                                status_maq: novaFlag,
                                 localizacao: document.getElementById('novaLocalizacao').value || null,
                                 cliente: document.getElementById('novoCliente').value || null
                             })
@@ -3552,7 +3698,7 @@
                                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                             },
                             body: JSON.stringify({ 
-                                flag: novaFlag,
+                                status_maq: novaFlag,
                                 localizacao: document.getElementById('novaLocalizacao').value || null,
                                 cliente: document.getElementById('novoCliente').value || null
                             })
@@ -3580,7 +3726,7 @@
         function openAlterarFlagModal(nroPedido, serie, flagAtual) {
             document.getElementById('flagNroPedido').value = nroPedido;
             document.getElementById('flagSerie').value = serie;
-            document.getElementById('novaFlag').value = flagAtual || 'Em andamento';
+            document.getElementById('novaFlag').value = flagAtual || 'Em Trânsito';
             elements.alterarFlagModal.style.display = 'flex';
         }
 
@@ -3602,7 +3748,7 @@
             try {
                 // Verificar se já existe agendamento
                 const checkResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?n_pedido=eq.${nroPedido}&serie=eq.${serie}`,
+                    `${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?numero_pedido=eq.${nroPedido}&serie=eq.${serie}`,
                     {
                         headers: {
                             'apikey': SUPABASE_ANON_KEY,
@@ -3619,7 +3765,7 @@
                     if (agendamentoExistente.length > 0) {
                         // Reagendamento
                         result = await fetch(
-                            `${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?n_pedido=eq.${nroPedido}&serie=eq.${serie}`,
+                            `${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?numero_pedido=eq.${nroPedido}&serie=eq.${serie}`,
                             {
                                 method: 'PATCH',
                                 headers: {
@@ -3628,8 +3774,8 @@
                                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                                 },
                                 body: JSON.stringify({
-                                    data_agendamento: dataAgendamento,
-                                    motivo_reagendamento: motivoReagendamento,
+                                    data_programacao: dataAgendamento,
+                                    motivo_reprogramacao: motivoReagendamento,
                                     updated_at: new Date().toISOString()
                                 })
                             }
@@ -3646,11 +3792,10 @@
                                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                                 },
                                 body: JSON.stringify({
-                                    n_pedido: nroPedido,
+                                    numero_pedido: nroPedido,
                                     serie: serie,
-                                    data_agendamento: dataAgendamento,
-                                    data_original: dataAgendamento,
-                                    status: 'Agendado',
+                                    data_programacao: dataAgendamento,
+                                    status_entrega: 'Agendado',
                                     created_at: new Date().toISOString()
                                 })
                             }
@@ -3772,12 +3917,12 @@
                     const chegadaFim = document.getElementById('chegadaPatioFimFilter').value;
                     const anoEstoque = document.getElementById('anoEstoqueFilter').value;
 
-                    if (pdiFilter) filters.push(`pdi=eq.${pdiFilter}`);
-                    if (flagFilter) filters.push(`flag=eq.${encodeURIComponent(flagFilter)}`);
-                    if (nPedidoFilter) filters.push(`n_pedido=ilike.*${nPedidoFilter}*`);
+                    if (pdiFilter) filters.push(`status_pdi=eq.${pdiFilter}`);
+                    if (flagFilter) filters.push(`status_maq=eq.${encodeURIComponent(flagFilter)}`);
+                    if (nPedidoFilter) filters.push(`numero_pedido=ilike.*${nPedidoFilter}*`);
                     if (serieFilter) filters.push(`serie=ilike.*${serieFilter}*`);
                     if (revendaFilter) filters.push(`revenda=eq.${revendaFilter}`);
-                    if (statusPgtoFilter) filters.push(`status_pgto=eq.${encodeURIComponent(statusPgtoFilter)}`);
+                    if (statusPgtoFilter) filters.push(`status_pagamento=eq.${encodeURIComponent(statusPgtoFilter)}`);
                     if (anoEstoque) filters.push(`ano=eq.${anoEstoque}`);
                     if (chegadaInicio) filters.push(`chegada_patio=gte.${chegadaInicio}`);
                     if (chegadaFim) filters.push(`chegada_patio=lte.${chegadaFim}`);
@@ -3790,7 +3935,7 @@
                     const status = document.getElementById('statusPedidosFilter').value;
                     const ano = document.getElementById('anoPedidosFilter').value;
                     if (revenda) filters.push(`revenda=eq.${revenda}`);
-                    if (nPedido) filters.push(`n_pedido=ilike.*${nPedido}*`);
+                    if (nPedido) filters.push(`numero_pedido=ilike.*${nPedido}*`);
                     if (status) filters.push(`status=eq.${encodeURIComponent(status)}`);
                     if (entregaIni) filters.push(`entrega=gte.${entregaIni}`);
                     if (entregaFim) filters.push(`entrega=lte.${entregaFim}`);
@@ -3803,10 +3948,10 @@
                     const dataFim = document.getElementById('dataVendaFimFilter').value;
                     const status = document.getElementById('statusVendasFilter').value;
                     if (revenda) filters.push(`revenda=eq.${revenda}`);
-                    if (nPedido) filters.push(`n_pedido=ilike.*${nPedido}*`);
+                    if (nPedido) filters.push(`numero_pedido=ilike.*${nPedido}*`);
                     if (dataIni) filters.push(`data_venda=gte.${dataIni}`);
                     if (dataFim) filters.push(`data_venda=lte.${dataFim}`);
-                    if (status) filters.push(`status_pgto=eq.${encodeURIComponent(status)}`);
+            if (status) filters.push(`status_pagamento=eq.${encodeURIComponent(status)}`);
                 }
                 
                 if (filters.length > 0) {
@@ -3826,20 +3971,20 @@
                     if (tableName === 'estoque') {
                         appState.tables[tableName].data = (data || []).map(it => ({
                             revenda: it.revenda,
-                            n_pedido: it.n_pedido,
-                            pdi: it.pdi,
+                            n_pedido: it.numero_pedido,
+                            pdi: it.status_pdi,
                             status_entrega: it.status_entrega_tecnica || it.status_entrega || '',
                             cliente: it.cliente,
                             qtde: it.qtde,
                             modelo: it.modelo,
                             localizacao: it.localizacao,
-                            dias_fat_fab: it.dias_fat_fab || it.dias_faturado_fabrica || it.dias_faturado_fabrica,
-                            status_pgto: it.status_pgto,
+                            dias_fat_fab: it.dias_faturado_fabrica || it.dias_fat_fab,
+                            status_pagamento: it.status_pagamento,
                             ano: it.ano,
-                            prev_chegada: it.prev_chegada || it.previsao_chegada,
+                            prev_chegada: it.previsao_chegada || it.prev_chegada,
                             chegada_patio: it.chegada_patio,
                             data_venda: it.data_venda,
-                            flag: it.flag
+                            flag: it.status_maq
                         }));
                         appState.tables[tableName].total = appState.tables[tableName].data.length;
                     } else {
@@ -3949,10 +4094,10 @@
                 if (tableName === 'estoque') {
                     actions = `
                         <div class="action-buttons">
-                            <button class="action-btn" title="Detalhes" onclick="showDetails('${item.n_pedido}', '${item.serie}')">
+                            <button class="action-btn" title="Detalhes" onclick="showDetails('${item.numero_pedido || item.n_pedido}', '${item.serie}')">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="action-btn" title="Alterar Status" onclick="openAlterarFlagModal('${item.n_pedido}', '${item.serie}', '${item.flag}')">
+                            <button class="action-btn" title="Alterar Status" onclick="openAlterarFlagModal('${item.numero_pedido || item.n_pedido}', '${item.serie}', '${item.flag}')">
                                 <i class="fas fa-flag"></i>
                             </button>
                         </div>
@@ -3960,7 +4105,7 @@
                 } else if (tableName === 'entrega_tecnica') {
                     actions = `
                         <div class="action-buttons">
-                            <button class="action-btn" title="Agendar Entrega" onclick="openAgendarEntregaModal('${item.n_pedido}', '${item.serie}', ${item.data_agendamento ? true : false})">
+                            <button class="action-btn" title="Agendar Entrega" onclick="openAgendarEntregaModal('${item.numero_pedido || item.n_pedido}', '${item.serie}', ${item.data_agendamento ? true : false})">
                                 <i class="fas fa-calendar-alt"></i>
                             </button>
                         </div>
@@ -3968,7 +4113,7 @@
                 } else {
                     actions = `
                         <div class="action-buttons">
-                            <button class="action-btn" title="Detalhes" onclick="showDetails('${item.n_pedido}', '${item.serie}')">
+                            <button class="action-btn" title="Detalhes" onclick="showDetails('${item.numero_pedido || item.n_pedido}', '${item.serie}')">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
@@ -3988,7 +4133,7 @@
                             <td>${item.modelo || ''}</td>
                             <td>${item.localizacao || ''}</td>
                             <td>${item.dias_fat_fab || ''}</td>
-                            <td><span class="status-badge ${getStatusClass(item.status_pgto)}">${item.status_pgto || ''}</span></td>
+                            <td><span class="status-badge ${getStatusClass(item.status_pagamento)}">${item.status_pagamento || ''}</span></td>
                             <td>${item.ano || ''}</td>
                             <td>${item.prev_chegada || ''}</td>
                             <td>${item.chegada_patio || ''}</td>
@@ -4002,7 +4147,7 @@
 } else if (tableName === 'pedidos_jcb') {
     return `
         <tr>
-            <td>${item.n_pedido || ''}</td>
+            <td>${item.numero_pedido || ''}</td>
             <td>${item.modelo || ''}</td>
             <td>${item.entrega || ''}</td>
             <td>${item.uf || ''}</td>
@@ -4020,14 +4165,14 @@
     return `
                         <tr>
                             <td>${item.revenda || ''}</td>
-                            <td>${item.n_pedido || ''}</td>
+            <td>${item.numero_pedido || ''}</td>
                             <td>${item.serie || ''}</td>
                             <td>${item.data_venda || ''}</td>
                             <td>${item.cliente || ''}</td>
                             <td>${item.qtde || ''}</td>
                             <td>${item.modelo || ''}</td>
                             <td>${item.localizacao || ''}</td>
-                            <td><span class="status-badge ${getStatusClass(item.status_pgto)}">${item.status_pgto || ''}</span></td>
+            <td><span class="status-badge ${getStatusClass(item.status_pagamento)}">${item.status_pagamento || ''}</span></td>
                             <td>${actions}</td>
         </tr>
     `;
@@ -4207,27 +4352,22 @@
                 }
                 
                 row.innerHTML = `
-                    <td>${item.n_pedido || ''}</td>
+                    <td>${item.numero_pedido || ''}</td>
                     <td>${item.serie || ''}</td>
                     <td>${item.cliente || ''}</td>
                     <td>${item.revenda || ''}</td>
                     <td>${item.modelo || ''}</td>
-                    <td>${item.data_entrada ? new Date(item.data_entrada).toLocaleDateString('pt-BR') : ''}</td>
-                    <td>${item.data_programada ? new Date(item.data_programada).toLocaleDateString('pt-BR') : ''}</td>
+                    <td>${item.data_maq_patio ? new Date(item.data_maq_patio).toLocaleDateString('pt-BR') : ''}</td>
+                    <td>${item.data_programacao ? new Date(item.data_programacao).toLocaleDateString('pt-BR') : ''}</td>
                     <td>
                         <span class="status-badge ${item.status_pdi === 'Sim' ? 'status-success' : 'status-warning'}">
                             ${item.status_pdi || 'Não'}
                         </span>
                     </td>
-                    <td>
-                        <span class="dias-counter ${item.dias_sem_pdi > 3 ? 'dias-critical' : item.dias_sem_pdi > 1 ? 'dias-warning' : ''}">
-                            ${item.dias_sem_pdi || 0}
-                        </span>
-                    </td>
                     <td>${item.data_reprogramacao ? new Date(item.data_reprogramacao).toLocaleDateString('pt-BR') : ''}</td>
                     <td>${item.motivo_reprogramacao || ''}</td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="openGerenciarPDIModal('${item.n_pedido}', '${item.serie}')">
+                        <button class="btn btn-sm btn-primary" onclick="openGerenciarPDIModal('${item.numero_pedido}', '${item.serie}')">
                             <i class="fas fa-edit"></i> Gerenciar
                         </button>
                     </td>
@@ -4238,7 +4378,7 @@
         
         function openGerenciarPDIModal(nPedido, serie) {
             // Buscar dados atuais do PDI
-            fetch(`${SUPABASE_URL}/rest/v1/programacao_pdi?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
+            fetch(`${SUPABASE_URL}/rest/v1/programacao_pdi?numero_pedido=eq.${nPedido}&serie=eq.${serie}`, {
                 headers: {
                     'apikey': SUPABASE_ANON_KEY,
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -4249,7 +4389,7 @@
                 if (data.length > 0) {
                     const item = data[0];
                     document.getElementById('pdiStatus').value = item.status_pdi || 'Não';
-                    document.getElementById('pdiDataProgramacao').value = item.data_programada || '';
+                    document.getElementById('pdiDataProgramacao').value = item.data_programacao || '';
                     document.getElementById('pdiDataReprogramacao').value = item.data_reprogramacao || '';
                     document.getElementById('pdiMotivoReprogramacao').value = item.motivo_reprogramacao || '';
                 }
@@ -4290,14 +4430,13 @@
             try {
                 const updateData = {
                     status_pdi: status,
-                    data_programada: dataProgramacao || null,
+                    data_programacao: dataProgramacao || null,
                     data_reprogramacao: dataReprogramacao || null,
                     motivo_reprogramacao: motivoReprogramacao || null,
-                    responsavel_email: appState.currentUser?.email,
                     updated_at: new Date().toISOString()
                 };
                 
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/programacao_pdi?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/programacao_pdi?numero_pedido=eq.${nPedido}&serie=eq.${serie}`, {
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
@@ -4310,7 +4449,7 @@
                 if (response.ok) {
                     // Atualizar também o estoque se o PDI for marcado como concluído
                     if (status === 'Sim') {
-                        await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
+                        await fetch(`${SUPABASE_URL}/rest/v1/estoque?numero_pedido=eq.${nPedido}&serie=eq.${serie}`, {
                             method: 'PATCH',
                             headers: {
                                 'apikey': SUPABASE_ANON_KEY,
@@ -4318,7 +4457,7 @@
                                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                             },
                             body: JSON.stringify({
-                                pdi: 'Sim',
+                                status_pdi: 'Sim',
                                 updated_at: new Date().toISOString()
                             })
                         });
@@ -4344,7 +4483,7 @@
         async function migrateToPDI(nPedido, serie) {
             try {
                 // Buscar dados do estoque
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/estoque?numero_pedido=eq.${nPedido}&serie=eq.${serie}`, {
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -4358,7 +4497,7 @@
                         const item = estoqueData[0];
                         
                         // Verificar se já existe no PDI
-                        const pdiCheck = await fetch(`${SUPABASE_URL}/rest/v1/programacao_pdi?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
+                        const pdiCheck = await fetch(`${SUPABASE_URL}/rest/v1/programacao_pdi?numero_pedido=eq.${nPedido}&serie=eq.${serie}`, {
                             headers: {
                                 'apikey': SUPABASE_ANON_KEY,
                                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -4371,16 +4510,13 @@
                             if (existingPDI.length === 0) {
                                 // Criar novo registro PDI
                                 const pdiData = {
-                                    estoque_id: item.id,
-                                    n_pedido: item.n_pedido,
+                                    numero_pedido: item.numero_pedido || nPedido,
                                     serie: item.serie,
                                     cliente: item.cliente,
                                     revenda: item.revenda,
                                     modelo: item.modelo,
-                                    data_entrada: new Date().toISOString().split('T')[0],
+                                    data_maq_patio: new Date().toISOString().split('T')[0],
                                     status_pdi: 'Não',
-                                    dias_sem_pdi: 0,
-                                    responsavel_email: appState.currentUser?.email,
                                     created_at: new Date().toISOString()
                                 };
                                 
@@ -4428,7 +4564,7 @@
                 }
                 
                 // Verificar entregas técnicas sem agendamento há mais de 24h
-                const entregaResponse = await fetch(`${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?data_agendamento=is.null&created_at=lt.${getDate24HoursAgo()}`, {
+                const entregaResponse = await fetch(`${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?data_programacao=is.null&created_at=lt.${getDate24HoursAgo()}`, {
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
                         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -4542,27 +4678,17 @@
                 }
                 
                 row.innerHTML = `
-                    <td>${item.n_pedido || ''}</td>
+                    <td>${item.numero_pedido || ''}</td>
                     <td>${item.serie || ''}</td>
                     <td>${item.cliente || ''}</td>
                     <td>${item.revenda || ''}</td>
                     <td>${item.modelo || ''}</td>
-                    <td>${item.data_recebimento ? new Date(item.data_recebimento).toLocaleDateString('pt-BR') : ''}</td>
-                    <td>${item.data_agendamento ? new Date(item.data_agendamento).toLocaleDateString('pt-BR') : ''}</td>
+                    <td>${item.data_programacao ? new Date(item.data_programacao).toLocaleDateString('pt-BR') : ''}</td>
+                    <td>${item.data_reprogramacao ? new Date(item.data_reprogramacao).toLocaleDateString('pt-BR') : ''}</td>
+                    <td>${item.motivo_reprogramacao || ''}</td>
+                    <td><span class="status-badge ${item.status_entrega === 'Feito' ? 'status-success' : 'status-warning'}">${item.status_entrega || 'Pendente'}</span></td>
                     <td>
-                        <span class="status-badge ${item.status_entrega === 'Concluída' ? 'status-success' : item.status_entrega === 'Agendada' ? 'status-info' : 'status-warning'}">
-                            ${item.status_entrega || 'Pendente'}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="dias-counter ${item.dias_sem_agendamento > 3 ? 'dias-critical' : item.dias_sem_agendamento > 1 ? 'dias-warning' : ''}">
-                            ${item.dias_sem_agendamento || 0}
-                        </span>
-                    </td>
-                    <td>${item.data_reagendamento ? new Date(item.data_reagendamento).toLocaleDateString('pt-BR') : ''}</td>
-                    <td>${item.motivo_reagendamento || ''}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="openAgendarEntregaModal('${item.n_pedido}', '${item.serie}')">
+                        <button class="btn btn-sm btn-primary" onclick="openAgendarEntregaModal('${item.numero_pedido}', '${item.serie}')">
                             <i class="fas fa-calendar"></i> Agendar
                         </button>
                     </td>
@@ -4588,7 +4714,7 @@
                         const item = estoqueData[0];
                         
                         // Verificar se já existe na entrega técnica
-                        const entregaCheck = await fetch(`${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
+                        const entregaCheck = await fetch(`${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?numero_pedido=eq.${nPedido}&serie=eq.${serie}`, {
                             headers: {
                                 'apikey': SUPABASE_ANON_KEY,
                                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -4601,16 +4727,15 @@
                             if (existingEntrega.length === 0) {
                                 // Criar novo registro de entrega técnica
                                 const entregaData = {
-                                    estoque_id: item.id,
-                                    n_pedido: item.n_pedido,
+                                    numero_pedido: item.numero_pedido || nPedido,
                                     serie: item.serie,
                                     cliente: item.cliente,
                                     revenda: item.revenda,
                                     modelo: item.modelo,
-                                    data_recebimento: new Date().toISOString().split('T')[0],
+                                    data_programacao: null,
+                                    data_reprogramacao: null,
+                                    motivo_reprogramacao: null,
                                     status_entrega: 'Pendente',
-                                    dias_sem_agendamento: 0,
-                                    responsavel_email: appState.currentUser?.email,
                                     created_at: new Date().toISOString()
                                 };
                                 
