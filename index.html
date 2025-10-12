@@ -1348,13 +1348,46 @@
                 border-bottom: none;
             }
         }
+</style>
+    <style>
+        /* Branding image for login and header */
+        .brand-image {
+            height: 42px;
+            width: auto;
+            display: inline-block;
+            object-fit: contain;
+        }
+
+        .login-logo .brand-image {
+            height: 64px;
+            margin-bottom: 8px;
+        }
+
+        /* App footer */
+        .app-footer {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 16px;
+            color: var(--gray-dark);
+            background: #f7f8fa;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            z-index: 5;
+        }
+        .app-footer small { color: var(--gray-dark); }
     </style>
 </head>
 <body>
     <!-- Login Screen -->
     <div id="loginScreen" class="login-container">
         <div class="login-box">
-            <div class="login-logo">
+            <div class="login-logo" style="text-align:center">
+                <img src="./Nova Pasta/Imagem5.png" alt="Normaq" class="brand-image" onerror="this.style.display='none'">
                 <h1><i class="fas fa-tools"></i> Normaq Painel</h1>
                 <p>Operacional - Comercial & Pós-venda</p>
             </div>
@@ -1409,8 +1442,8 @@
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="logo-container">
-                <div class="logo">
-                    <i class="fas fa-tools"></i>
+                <div class="logo" style="gap:10px">
+                    <img src="./Nova Pasta/Imagem5.png" alt="Normaq" class="brand-image" onerror="this.style.display='none'">
                     <span class="logo-text">Normaq Painel</span>
                 </div>
             </div>
@@ -1557,6 +1590,27 @@
                                         <option value="Paraíba">Paraíba</option>
                                     </select>
                                 </div>
+                                <div class="filter-group">
+                                    <label for="statusPgtoFilter">Status Pagamento</label>
+                                    <select id="statusPgtoFilter" class="form-control">
+                                        <option value="">Todos</option>
+                                        <option value="PAGO TOTAL">PAGO TOTAL</option>
+                                        <option value="PENDENTE">PENDENTE</option>
+                                        <option value="CANCELADO">CANCELADO</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="chegadaPatioInicioFilter">Chegada Pátio (Início)</label>
+                                    <input type="date" id="chegadaPatioInicioFilter" class="form-control">
+                                </div>
+                                <div class="filter-group">
+                                    <label for="chegadaPatioFimFilter">Chegada Pátio (Fim)</label>
+                                    <input type="date" id="chegadaPatioFimFilter" class="form-control">
+                                </div>
+                                <div class="filter-group">
+                                    <label for="anoEstoqueFilter">Ano</label>
+                                    <input type="number" id="anoEstoqueFilter" class="form-control" min="2000" max="2035" placeholder="Ano">
+                                </div>
                             </div>
                             <div class="filter-actions">
                                 <button class="btn" id="applyEstoqueFilters">Aplicar Filtros</button>
@@ -1579,14 +1633,19 @@
                                         <tr>
                                             <th data-sort="revenda">Revenda <i class="fas fa-sort"></i></th>
                                             <th data-sort="n_pedido">Nº Pedido <i class="fas fa-sort"></i></th>
-                                            <th data-sort="serie">Série <i class="fas fa-sort"></i></th>
-                                            <th data-sort="data_venda">Data Venda <i class="fas fa-sort"></i></th>
-                                            <th data-sort="modelo">Modelo <i class="fas fa-sort"></i></th>
+                                            <th data-sort="pdi">Status PDI <i class="fas fa-sort"></i></th>
+                                            <th data-sort="status_entrega">Status Entrega Técnica <i class="fas fa-sort"></i></th>
                                             <th data-sort="cliente">Cliente <i class="fas fa-sort"></i></th>
+                                            <th data-sort="qtde">Qtde <i class="fas fa-sort"></i></th>
+                                            <th data-sort="modelo">Modelo <i class="fas fa-sort"></i></th>
                                             <th data-sort="localizacao">Localização <i class="fas fa-sort"></i></th>
-                                            <th data-sort="status_pgto">Status PGTO <i class="fas fa-sort"></i></th>
-                                            <th data-sort="pdi">PDI <i class="fas fa-sort"></i></th>
-                                            <th data-sort="flag">Flag <i class="fas fa-sort"></i></th>
+                                            <th data-sort="dias_fat_fab">Dias Fat. Fábrica <i class="fas fa-sort"></i></th>
+                                            <th data-sort="status_pgto">Status Pagamento <i class="fas fa-sort"></i></th>
+                                            <th data-sort="ano">Ano <i class="fas fa-sort"></i></th>
+                                            <th data-sort="prev_chegada">Previsão Chegada <i class="fas fa-sort"></i></th>
+                                            <th data-sort="chegada_patio">Chegada Pátio <i class="fas fa-sort"></i></th>
+                                            <th data-sort="data_venda">Data Venda <i class="fas fa-sort"></i></th>
+                                            <th data-sort="flag">Status Maq. <i class="fas fa-sort"></i></th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
@@ -1642,6 +1701,10 @@
                                         <option value="PENDENTE">PENDENTE</option>
                                         <option value="CANCELADO">CANCELADO</option>
                                     </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="anoPedidosFilter">Ano</label>
+                                    <input type="number" id="anoPedidosFilter" class="form-control" min="2000" max="2035" placeholder="Ano">
                                 </div>
                             </div>
                             <div class="filter-actions">
@@ -2332,6 +2395,10 @@
                     </div>
                 </div>
             </div>
+            <div class="app-footer">
+                <small>Normaq • Comercial & Pós-venda</small>
+                <small>&copy; <span id="footerYear"></span></small>
+            </div>
         </div>
     </div>
 
@@ -2496,6 +2563,14 @@
                             <option value="Entregue ao cliente">Entregue ao cliente</option>
                         </select>
                     </div>
+                <div class="form-group">
+                    <label for="novaLocalizacao">Localização</label>
+                    <input type="text" id="novaLocalizacao" class="form-control" placeholder="Ex.: Pátio, Em trânsito...">
+                </div>
+                <div class="form-group">
+                    <label for="novoCliente">Cliente</label>
+                    <input type="text" id="novoCliente" class="form-control" placeholder="Nome do cliente">
+                </div>
                     <div id="flagWarning" class="alert alert-warning" style="display: none;">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span>Para transferir para Entrega Técnica, o PDI deve estar finalizado.</span>
@@ -2964,6 +3039,9 @@
                 
                 // Carregar dados iniciais
                 loadInitialData();
+                // Footer year
+                const y = document.getElementById('footerYear');
+                if (y) y.textContent = new Date().getFullYear();
             } else {
                 // Se não tem usuário válido, volta para login
                 showLogin();
@@ -3420,7 +3498,9 @@
                             },
                             body: JSON.stringify({ 
                                 flag: novaFlag,
-                                data_et: new Date().toISOString().split('T')[0]
+                                data_et: new Date().toISOString().split('T')[0],
+                                localizacao: document.getElementById('novaLocalizacao').value || null,
+                                cliente: document.getElementById('novoCliente').value || null
                             })
                         }
                     );
@@ -3444,7 +3524,11 @@
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                             },
-                            body: JSON.stringify({ flag: novaFlag })
+                            body: JSON.stringify({ 
+                                flag: novaFlag,
+                                localizacao: document.getElementById('novaLocalizacao').value || null,
+                                cliente: document.getElementById('novoCliente').value || null
+                            })
                         }
                     );
                     
@@ -3467,7 +3551,11 @@
                                 'Content-Type': 'application/json',
                                 'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                             },
-                            body: JSON.stringify({ flag: novaFlag })
+                            body: JSON.stringify({ 
+                                flag: novaFlag,
+                                localizacao: document.getElementById('novaLocalizacao').value || null,
+                                cliente: document.getElementById('novoCliente').value || null
+                            })
                         }
                     );
                     
@@ -3679,12 +3767,46 @@
                     const nPedidoFilter = document.getElementById('nPedidoFilter').value;
                     const serieFilter = document.getElementById('serieFilter').value;
                     const revendaFilter = document.getElementById('revendaFilter').value;
-                    
+                    const statusPgtoFilter = document.getElementById('statusPgtoFilter').value;
+                    const chegadaInicio = document.getElementById('chegadaPatioInicioFilter').value;
+                    const chegadaFim = document.getElementById('chegadaPatioFimFilter').value;
+                    const anoEstoque = document.getElementById('anoEstoqueFilter').value;
+
                     if (pdiFilter) filters.push(`pdi=eq.${pdiFilter}`);
                     if (flagFilter) filters.push(`flag=eq.${encodeURIComponent(flagFilter)}`);
                     if (nPedidoFilter) filters.push(`n_pedido=ilike.*${nPedidoFilter}*`);
                     if (serieFilter) filters.push(`serie=ilike.*${serieFilter}*`);
                     if (revendaFilter) filters.push(`revenda=eq.${revendaFilter}`);
+                    if (statusPgtoFilter) filters.push(`status_pgto=eq.${encodeURIComponent(statusPgtoFilter)}`);
+                    if (anoEstoque) filters.push(`ano=eq.${anoEstoque}`);
+                    if (chegadaInicio) filters.push(`chegada_patio=gte.${chegadaInicio}`);
+                    if (chegadaFim) filters.push(`chegada_patio=lte.${chegadaFim}`);
+                }
+                if (tableName === 'pedidos_jcb') {
+                    const revenda = document.getElementById('revendaPedidosFilter').value;
+                    const nPedido = document.getElementById('nPedidoPedidosFilter').value;
+                    const entregaIni = document.getElementById('entregaInicioFilter').value;
+                    const entregaFim = document.getElementById('entregaFimFilter').value;
+                    const status = document.getElementById('statusPedidosFilter').value;
+                    const ano = document.getElementById('anoPedidosFilter').value;
+                    if (revenda) filters.push(`revenda=eq.${revenda}`);
+                    if (nPedido) filters.push(`n_pedido=ilike.*${nPedido}*`);
+                    if (status) filters.push(`status=eq.${encodeURIComponent(status)}`);
+                    if (entregaIni) filters.push(`entrega=gte.${entregaIni}`);
+                    if (entregaFim) filters.push(`entrega=lte.${entregaFim}`);
+                    if (ano) filters.push(`ano=eq.${ano}`);
+                }
+                if (tableName === 'vendas') {
+                    const revenda = document.getElementById('revendaVendasFilter').value;
+                    const nPedido = document.getElementById('nPedidoVendasFilter').value;
+                    const dataIni = document.getElementById('dataVendaInicioFilter').value;
+                    const dataFim = document.getElementById('dataVendaFimFilter').value;
+                    const status = document.getElementById('statusVendasFilter').value;
+                    if (revenda) filters.push(`revenda=eq.${revenda}`);
+                    if (nPedido) filters.push(`n_pedido=ilike.*${nPedido}*`);
+                    if (dataIni) filters.push(`data_venda=gte.${dataIni}`);
+                    if (dataFim) filters.push(`data_venda=lte.${dataFim}`);
+                    if (status) filters.push(`status_pgto=eq.${encodeURIComponent(status)}`);
                 }
                 
                 if (filters.length > 0) {
@@ -3700,8 +3822,30 @@
                 
                 if (response.ok) {
                     const data = await response.json();
-                    appState.tables[tableName].data = data || [];
-                    appState.tables[tableName].total = data.length;
+                    // Mapear campos para matriz solicitada no Estoque
+                    if (tableName === 'estoque') {
+                        appState.tables[tableName].data = (data || []).map(it => ({
+                            revenda: it.revenda,
+                            n_pedido: it.n_pedido,
+                            pdi: it.pdi,
+                            status_entrega: it.status_entrega_tecnica || it.status_entrega || '',
+                            cliente: it.cliente,
+                            qtde: it.qtde,
+                            modelo: it.modelo,
+                            localizacao: it.localizacao,
+                            dias_fat_fab: it.dias_fat_fab || it.dias_faturado_fabrica || it.dias_faturado_fabrica,
+                            status_pgto: it.status_pgto,
+                            ano: it.ano,
+                            prev_chegada: it.prev_chegada || it.previsao_chegada,
+                            chegada_patio: it.chegada_patio,
+                            data_venda: it.data_venda,
+                            flag: it.flag
+                        }));
+                        appState.tables[tableName].total = appState.tables[tableName].data.length;
+                    } else {
+                        appState.tables[tableName].data = data || [];
+                        appState.tables[tableName].total = data.length;
+                    }
                     
                     renderTable(tableName);
                 } else {
@@ -3837,26 +3981,19 @@
                         <tr>
                             <td>${item.revenda || ''}</td>
                             <td>${item.n_pedido || ''}</td>
-                            <td>${item.serie || ''}</td>
-                            <td>${item.data_venda || ''}</td>
-                            <td>${item.modelo || ''}</td>
+                            <td><span class="status-badge ${item.pdi === 'Sim' ? 'status-success' : 'status-warning'}">${item.pdi || 'Não'}</span></td>
+                            <td>${item.status_entrega || 'Pendente'}</td>
                             <td>${item.cliente || ''}</td>
+                            <td>${item.qtde || ''}</td>
+                            <td>${item.modelo || ''}</td>
                             <td>${item.localizacao || ''}</td>
-                            <td>
-                                <span class="status-badge ${getStatusClass(item.status_pgto)}">
-                                    ${item.status_pgto || ''}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="status-badge ${item.pdi === 'Sim' ? 'status-success' : 'status-warning'}">
-                                    ${item.pdi || 'Não'}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="flag-badge ${getFlagClass(item.flag)}">
-                                    ${item.flag || ''}
-                                </span>
-                            </td>
+                            <td>${item.dias_fat_fab || ''}</td>
+                            <td><span class="status-badge ${getStatusClass(item.status_pgto)}">${item.status_pgto || ''}</span></td>
+                            <td>${item.ano || ''}</td>
+                            <td>${item.prev_chegada || ''}</td>
+                            <td>${item.chegada_patio || ''}</td>
+                            <td>${item.data_venda || ''}</td>
+                            <td><span class="flag-badge ${getFlagClass(item.flag)}">${item.flag || ''}</span></td>
                             <td>${actions}</td>
                         </tr>
                     `;
@@ -3881,43 +4018,17 @@
     `;
 } else if (tableName === 'vendas') {
     return `
-        <tr>
-            <td>${item.revenda || ''}</td>
-            <td>${item.n_pedido || ''}</td>
-            <td>${item.serie || ''}</td>
-            <td>${item.data_venda || ''}</td>
-            <td>${item.cliente || ''}</td>
-            <td>${item.modelo || ''}</td>
-            <td>${item.localizacao || ''}</td>
-            <td>${formatCurrency(item.venda)}</td>
-            <td>
-                <span class="status-badge ${getStatusClass(item.status_pgto)}">
-                    ${item.status_pgto || ''}
-                </span>
-            </td>
-            <td>${actions}</td>
-        </tr>
-    `;
-}  // ← FECHAMENTO CORRETO AQUI
-
-// Na função renderTable, atualize a parte das vendas:
-} else if (tableName === 'vendas') {
-    return `
-        <tr>
-            <td>${item.revenda || ''}</td>
-            <td>${item.n_pedido || ''}</td>
-            <td>${item.serie || ''}</td>
-            <td>${item.data_venda || ''}</td>
-            <td>${item.cliente || ''}</td>
-            <td>${item.modelo || ''}</td>
-            <td>${item.localizacao || ''}</td>
-            <td>${formatCurrency(item.venda)}</td>
-            <td>
-                <span class="status-badge ${getStatusClass(item.status_pgto)}">
-                    ${item.status_pgto || ''}
-                </span>
-            </td>
-            <td>${actions}</td>
+                        <tr>
+                            <td>${item.revenda || ''}</td>
+                            <td>${item.n_pedido || ''}</td>
+                            <td>${item.serie || ''}</td>
+                            <td>${item.data_venda || ''}</td>
+                            <td>${item.cliente || ''}</td>
+                            <td>${item.qtde || ''}</td>
+                            <td>${item.modelo || ''}</td>
+                            <td>${item.localizacao || ''}</td>
+                            <td><span class="status-badge ${getStatusClass(item.status_pgto)}">${item.status_pgto || ''}</span></td>
+                            <td>${actions}</td>
         </tr>
     `;
 }
