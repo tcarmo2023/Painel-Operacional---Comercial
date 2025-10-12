@@ -3132,9 +3132,6 @@
         modelo: document.getElementById('estoque_modelo').value.trim() || null,
         nf_jcb: document.getElementById('estoque_nf_jcb').value.trim() || null,
         localizacao: document.getElementById('estoque_localizacao').value.trim() || null,
-        // CORREÇÃO: Nome correto da coluna
-        frete_sao_paulo_recife_fortaleza: document.getElementById('estoque_frete').value ? 
-            parseFloat(document.getElementById('estoque_frete').value) : null,
         status_pgto: document.getElementById('estoque_status_pgto').value || null,
         ano: document.getElementById('estoque_ano').value ? 
             parseInt(document.getElementById('estoque_ano').value) : null,
@@ -3147,7 +3144,6 @@
         fat_fab: document.getElementById('estoque_fat_fab').value || null,
         // Campos adicionais com valores padrão
         pdi: null,
-        status_et: 'Não',
         qtde_dias_patio: null,
         dealer_net: null,
         dias_no_patio: null,
@@ -3170,8 +3166,16 @@
     try {
         console.log('Enviando dados para Supabase...');
         
+        // Sanitiza carga útil para evitar colunas desconhecidas e valores nulos
+        const allowedColumns = [
+            'revenda','n_pedido','serie','data_venda','cliente','qtde','modelo','nf_jcb','localizacao',
+            'status_pgto','ano','retirada_fab','prev_chegada','chegada_patio','dias_fat_fab','r_frete','fat_fab',
+            'flag','pdi','created_at'
+        ];
+        const payload = sanitizePayload(formData, allowedColumns);
+
         // Fazer o POST para criar novo registro
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/estoque`, {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/estoque?select=id`, {
             method: 'POST',
             headers: {
                 'apikey': SUPABASE_ANON_KEY,
@@ -3179,7 +3183,7 @@
                 'Content-Type': 'application/json',
                 'Prefer': 'return=representation'
             },
-            body: JSON.stringify(formData)
+            body: JSON.stringify(payload)
         });
         
         console.log('Resposta do Supabase:', response.status, response.statusText);
@@ -3187,19 +3191,14 @@
         if (response.ok) {
             const result = await response.json();
             console.log('Registro criado com sucesso:', result);
-            
             showToast('Estoque cadastrado com sucesso!', 'success');
             limparFormulario('estoque');
-            
-            // Recarregar a tabela de estoque
-            setTimeout(() => {
-                loadTableData('estoque');
-            }, 1000);
-            
+            loadTableData('estoque');
         } else {
-            const errorText = await response.text();
+            let errorText = await response.text();
+            try { const parsed = JSON.parse(errorText); errorText = parsed.message || errorText; } catch {}
             console.error('Erro detalhado do Supabase:', errorText);
-            showToast('Erro ao cadastrar estoque. Verifique o console.', 'error');
+            showToast(`Erro ao cadastrar estoque: ${errorText}`, 'error');
         }
     } catch (error) {
         console.error('Erro ao cadastrar estoque:', error);
@@ -3371,6 +3370,18 @@
                 document.getElementById('pedido_ano').value = '2024';
             }
             showToast('Formulário limpo!', 'info');
+        }
+
+        // Utilitário: remove chaves fora do schema e converte '' em null
+        function sanitizePayload(source, allowedKeys) {
+            const out = {};
+            for (const key of allowedKeys) {
+                if (Object.prototype.hasOwnProperty.call(source, key)) {
+                    const value = source[key];
+                    out[key] = value === '' ? null : value;
+                }
+            }
+            return out;
         }
 
         // 🧾 FUNÇÕES PARA ESTOQUE E FLAGS
