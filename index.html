@@ -3143,7 +3143,6 @@
             parseFloat(document.getElementById('estoque_r_frete').value) : null,
         fat_fab: document.getElementById('estoque_fat_fab').value || null,
         // Campos adicionais com valores padrão
-        pdi: null,
         qtde_dias_patio: null,
         dealer_net: null,
         dias_no_patio: null,
@@ -3170,7 +3169,7 @@
         const allowedColumns = [
             'revenda','n_pedido','serie','data_venda','cliente','qtde','modelo','nf_jcb','localizacao',
             'status_pgto','ano','retirada_fab','prev_chegada','chegada_patio','dias_fat_fab','r_frete','fat_fab',
-            'flag','pdi','created_at'
+            'flag','created_at'
         ];
         const payload = sanitizePayload(formData, allowedColumns);
 
@@ -3465,17 +3464,6 @@
                     if (updateResponse.ok) {
                         // Migrar para PDI
                         await migrateToPDI(nroPedido, serie);
-                        // Deixa coluna 'Status PDI' em branco até conclusão manual
-                        await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nroPedido}&serie=eq.${serie}`,
-                        {
-                            method: 'PATCH',
-                            headers: {
-                                'apikey': SUPABASE_ANON_KEY,
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                            },
-                            body: JSON.stringify({ pdi: null, updated_at: new Date().toISOString() })
-                        });
                         showToast('Item migrado para PDI com sucesso!', 'success');
                     } else {
                         throw new Error('Erro ao atualizar flag');
@@ -4229,7 +4217,6 @@
                             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                         },
                         body: JSON.stringify({
-                            pdi: status === 'Sim' ? 'Sim' : 'Não',
                             updated_at: new Date().toISOString()
                         })
                     });
@@ -4307,16 +4294,6 @@
                                 
                                 if (createResponse.ok) {
                                     console.log('Item migrado para PDI com sucesso');
-                                    // Deixa Status PDI em branco inicialmente
-                                    await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
-                                        method: 'PATCH',
-                                        headers: {
-                                            'apikey': SUPABASE_ANON_KEY,
-                                            'Content-Type': 'application/json',
-                                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                                        },
-                                        body: JSON.stringify({ pdi: null, updated_at: new Date().toISOString() })
-                                    });
                                 } else {
                                     console.error('Erro ao criar registro PDI');
                                 }
