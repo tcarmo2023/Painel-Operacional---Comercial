@@ -3731,10 +3731,58 @@
                 });
                 
                 if (response.ok) {
-                    const data = await response.json();
+                    let data = await response.json();
+
+                    // Enriquecer Estoque com Status PDI/Entrega Técnica sem colunas físicas
+                    if (tableName === 'estoque' && Array.isArray(data) && data.length > 0) {
+                        try {
+                            // Busca mínima de PDI e Entrega Técnica
+                            const [pdiRes, etRes] = await Promise.all([
+                                fetch(`${SUPABASE_URL}/rest/v1/programacao_pdi?select=n_pedido,serie,status_pdi`, {
+                                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                                }),
+                                fetch(`${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?select=n_pedido,serie,status_entrega`, {
+                                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                                })
+                            ]);
+
+                            let pdiList = [];
+                            let etList = [];
+                            if (pdiRes.ok) pdiList = await pdiRes.json();
+                            if (etRes.ok) etList = await etRes.json();
+
+                            const pdiMap = new Map();
+                            for (const p of pdiList) {
+                                const key = `${p.n_pedido}|${p.serie}`;
+                                pdiMap.set(key, p.status_pdi); // 'Sim' | 'Não' | null
+                            }
+
+                            const etMap = new Map();
+                            for (const e of etList) {
+                                const key = `${e.n_pedido}|${e.serie}`;
+                                etMap.set(key, e.status_entrega); // 'Concluída' | 'Agendada' | 'Pendente' | null
+                            }
+
+                            data = data.map(item => {
+                                const key = `${item.n_pedido}|${item.serie}`;
+                                const statusPDI = pdiMap.get(key);
+                                const statusET = etMap.get(key);
+                                return {
+                                    ...item,
+                                    // Mostra em branco se não houver PDI; caso exista, mostra 'Sim' ou 'Não'
+                                    pdi: statusPDI == null ? '' : statusPDI,
+                                    // Mostra 'Feito' somente se entrega técnica concluída, senão 'Não'
+                                    status_et: statusET === 'Concluída' ? 'Feito' : 'Não'
+                                };
+                            });
+                        } catch (e) {
+                            console.warn('Falha ao enriquecer Estoque com PDI/ET:', e);
+                        }
+                    }
+
                     appState.tables[tableName].data = data || [];
                     appState.tables[tableName].total = data.length;
-                    
+
                     renderTable(tableName);
                 } else {
                     throw new Error('Erro ao carregar dados');
