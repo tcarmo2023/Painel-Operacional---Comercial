@@ -1585,7 +1585,8 @@
                                             <th data-sort="cliente">Cliente <i class="fas fa-sort"></i></th>
                                             <th data-sort="localizacao">Localização <i class="fas fa-sort"></i></th>
                                             <th data-sort="status_pgto">Status PGTO <i class="fas fa-sort"></i></th>
-                                            <th data-sort="pdi">PDI <i class="fas fa-sort"></i></th>
+                                            <th data-sort="pdi">Status PDI <i class="fas fa-sort"></i></th>
+                                            <th data-sort="status_et">Status Entrega Técnica <i class="fas fa-sort"></i></th>
                                             <th data-sort="flag">Flag <i class="fas fa-sort"></i></th>
                                             <th>Ações</th>
                                         </tr>
@@ -3145,6 +3146,8 @@
             parseFloat(document.getElementById('estoque_r_frete').value) : null,
         fat_fab: document.getElementById('estoque_fat_fab').value || null,
         // Campos adicionais com valores padrão
+        pdi: null,
+        status_et: 'Não',
         qtde_dias_patio: null,
         dealer_net: null,
         dias_no_patio: null,
@@ -3451,6 +3454,17 @@
                     if (updateResponse.ok) {
                         // Migrar para PDI
                         await migrateToPDI(nroPedido, serie);
+                        // Deixa coluna 'Status PDI' em branco até conclusão manual
+                        await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nroPedido}&serie=eq.${serie}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                            },
+                            body: JSON.stringify({ pdi: null, updated_at: new Date().toISOString() })
+                        });
                         showToast('Item migrado para PDI com sucesso!', 'success');
                     } else {
                         throw new Error('Erro ao atualizar flag');
@@ -3541,6 +3555,7 @@
                                 },
                                 body: JSON.stringify({
                                     data_agendamento: dataAgendamento,
+                                    status_entrega: 'Agendada',
                                     motivo_reagendamento: motivoReagendamento,
                                     updated_at: new Date().toISOString()
                                 })
@@ -3562,7 +3577,7 @@
                                     serie: serie,
                                     data_agendamento: dataAgendamento,
                                     data_original: dataAgendamento,
-                                    status: 'Agendado',
+                                    status_entrega: 'Agendada',
                                     created_at: new Date().toISOString()
                                 })
                             }
@@ -3573,6 +3588,18 @@
                         showToast('Entrega técnica agendada com sucesso!', 'success');
                         closeAgendarEntregaModal();
                         loadEntregaTecnicaData();
+                        // Atualizar status na tabela de estoque (Status Entrega Técnica) como 'Não' até a conclusão
+                        await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nroPedido}&serie=eq.${serie}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'apikey': SUPABASE_ANON_KEY,
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                            },
+                            body: JSON.stringify({ status_et: 'Não', updated_at: new Date().toISOString() })
+                        });
+                        loadTableData('estoque');
                     } else {
                         throw new Error('Erro ao salvar agendamento');
                     }
@@ -3680,7 +3707,13 @@
                     const serieFilter = document.getElementById('serieFilter').value;
                     const revendaFilter = document.getElementById('revendaFilter').value;
                     
-                    if (pdiFilter) filters.push(`pdi=eq.${pdiFilter}`);
+                    if (pdiFilter) {
+                        if (pdiFilter === 'Sim') {
+                            filters.push('pdi=eq.Sim');
+                        } else if (pdiFilter === 'Não') {
+                            filters.push('or=(pdi.is.null,pdi.eq.Não)');
+                        }
+                    }
                     if (flagFilter) filters.push(`flag=eq.${encodeURIComponent(flagFilter)}`);
                     if (nPedidoFilter) filters.push(`n_pedido=ilike.*${nPedidoFilter}*`);
                     if (serieFilter) filters.push(`serie=ilike.*${serieFilter}*`);
@@ -3785,12 +3818,15 @@
             const tableBody = document.getElementById(`${tableName}TableBody`);
             if (!tableBody) return;
 
-            const data = appState.tables[tableName].data;
-            
+            const data = appState.tables[tableName].data || [];
+
+            const emptyColspanByTable = { estoque: 12, pedidos_jcb: 8, vendas: 10 };
+            const emptyColspan = emptyColspanByTable[tableName] || 8;
+
             if (data.length === 0) {
                 tableBody.innerHTML = `
                     <tr>
-                        <td colspan="11" style="text-align: center; padding: 40px; color: var(--gray-dark);">
+                        <td colspan="${emptyColspan}" style="text-align: center; padding: 40px; color: var(--gray-dark);">
                             <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
                             <p>Nenhum registro encontrado</p>
                         </td>
@@ -3798,12 +3834,10 @@
                 `;
                 return;
             }
-            
+
             tableBody.innerHTML = data.map(item => {
-                let actions = '';
-                
                 if (tableName === 'estoque') {
-                    actions = `
+                    const actions = `
                         <div class="action-buttons">
                             <button class="action-btn" title="Detalhes" onclick="showDetails('${item.n_pedido}', '${item.serie}')">
                                 <i class="fas fa-eye"></i>
@@ -3813,26 +3847,6 @@
                             </button>
                         </div>
                     `;
-                } else if (tableName === 'entrega_tecnica') {
-                    actions = `
-                        <div class="action-buttons">
-                            <button class="action-btn" title="Agendar Entrega" onclick="openAgendarEntregaModal('${item.n_pedido}', '${item.serie}', ${item.data_agendamento ? true : false})">
-                                <i class="fas fa-calendar-alt"></i>
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    actions = `
-                        <div class="action-buttons">
-                            <button class="action-btn" title="Detalhes" onclick="showDetails('${item.n_pedido}', '${item.serie}')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    `;
-                }
-                
-                // Renderizar linha da tabela baseada no tipo de tabela
-                if (tableName === 'estoque') {
                     return `
                         <tr>
                             <td>${item.revenda || ''}</td>
@@ -3848,8 +3862,13 @@
                                 </span>
                             </td>
                             <td>
-                                <span class="status-badge ${item.pdi === 'Sim' ? 'status-success' : 'status-warning'}">
-                                    ${item.pdi || 'Não'}
+                                <span class="status-badge ${item.pdi === 'Sim' ? 'status-success' : (item.pdi === 'Não' ? 'status-warning' : '')}">
+                                    ${item.pdi || ''}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge ${item.status_et === 'Feito' ? 'status-success' : 'status-warning'}">
+                                    ${item.status_et || 'Não'}
                                 </span>
                             </td>
                             <td>
@@ -3860,72 +3879,65 @@
                             <td>${actions}</td>
                         </tr>
                     `;
-                // Na função renderTable, atualize a parte dos pedidos JCB:
-// ✅ CORREÇÃO:
-} else if (tableName === 'pedidos_jcb') {
-    return `
-        <tr>
-            <td>${item.n_pedido || ''}</td>
-            <td>${item.modelo || ''}</td>
-            <td>${item.entrega || ''}</td>
-            <td>${item.uf || ''}</td>
-            <td>${item.revenda || ''}</td>
-            <td>
-                <span class="status-badge ${getStatusClass(item.status)}">
-                    ${item.status || ''}
-                </span>
-            </td>
-            <td>${item.ano || ''}</td>
-            <td>${actions}</td>
-        </tr>
-    `;
-} else if (tableName === 'vendas') {
-    return `
-        <tr>
-            <td>${item.revenda || ''}</td>
-            <td>${item.n_pedido || ''}</td>
-            <td>${item.serie || ''}</td>
-            <td>${item.data_venda || ''}</td>
-            <td>${item.cliente || ''}</td>
-            <td>${item.modelo || ''}</td>
-            <td>${item.localizacao || ''}</td>
-            <td>${formatCurrency(item.venda)}</td>
-            <td>
-                <span class="status-badge ${getStatusClass(item.status_pgto)}">
-                    ${item.status_pgto || ''}
-                </span>
-            </td>
-            <td>${actions}</td>
-        </tr>
-    `;
-}  // ← FECHAMENTO CORRETO AQUI
+                }
 
-// Na função renderTable, atualize a parte das vendas:
-} else if (tableName === 'vendas') {
-    return `
-        <tr>
-            <td>${item.revenda || ''}</td>
-            <td>${item.n_pedido || ''}</td>
-            <td>${item.serie || ''}</td>
-            <td>${item.data_venda || ''}</td>
-            <td>${item.cliente || ''}</td>
-            <td>${item.modelo || ''}</td>
-            <td>${item.localizacao || ''}</td>
-            <td>${formatCurrency(item.venda)}</td>
-            <td>
-                <span class="status-badge ${getStatusClass(item.status_pgto)}">
-                    ${item.status_pgto || ''}
-                </span>
-            </td>
-            <td>${actions}</td>
-        </tr>
-    `;
-}
-                
+                if (tableName === 'pedidos_jcb') {
+                    const actions = `
+                        <div class="action-buttons">
+                            <button class="action-btn" title="Detalhes" onclick="showDetails('${item.n_pedido}', '${item.serie || ''}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    `;
+                    return `
+                        <tr>
+                            <td>${item.n_pedido || ''}</td>
+                            <td>${item.modelo || ''}</td>
+                            <td>${item.entrega || ''}</td>
+                            <td>${item.uf || ''}</td>
+                            <td>${item.revenda || ''}</td>
+                            <td>
+                                <span class="status-badge ${getStatusClass(item.status)}">
+                                    ${item.status || ''}
+                                </span>
+                            </td>
+                            <td>${item.ano || ''}</td>
+                            <td>${actions}</td>
+                        </tr>
+                    `;
+                }
+
+                if (tableName === 'vendas') {
+                    const actions = `
+                        <div class="action-buttons">
+                            <button class="action-btn" title="Detalhes" onclick="showDetails('${item.n_pedido}', '${item.serie}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    `;
+                    return `
+                        <tr>
+                            <td>${item.revenda || ''}</td>
+                            <td>${item.n_pedido || ''}</td>
+                            <td>${item.serie || ''}</td>
+                            <td>${item.data_venda || ''}</td>
+                            <td>${item.cliente || ''}</td>
+                            <td>${item.modelo || ''}</td>
+                            <td>${item.localizacao || ''}</td>
+                            <td>${formatCurrency(item.venda)}</td>
+                            <td>
+                                <span class="status-badge ${getStatusClass(item.status_pgto)}">
+                                    ${item.status_pgto || ''}
+                                </span>
+                            </td>
+                            <td>${actions}</td>
+                        </tr>
+                    `;
+                }
+
                 return '';
             }).join('');
-            
-            // Atualizar informações de paginação
+
             const paginationInfo = document.getElementById(`${tableName}PaginationInfo`);
             if (paginationInfo) {
                 paginationInfo.textContent = `Mostrando ${data.length} de ${appState.tables[tableName].total} registros`;
@@ -3951,7 +3963,7 @@
             
             if (flag.includes('Faturado')) return 'flag-faturado';
             if (flag.includes('andamento')) return 'flag-andamento';
-            if (flag.includes('trânsito')) return 'flag-transito';
+            if (flag.includes('trânsito') || flag.includes('trnsito') || flag.includes('tr\u00e2nsito')) return 'flag-transito';
             if (flag.includes('Entregue')) return 'flag-entregue';
             if (flag.includes('Pátio')) return 'flag-patio';
             return '';
@@ -4197,25 +4209,24 @@
                 });
                 
                 if (response.ok) {
-                    // Atualizar também o estoque se o PDI for marcado como concluído
-                    if (status === 'Sim') {
-                        await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'apikey': SUPABASE_ANON_KEY,
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                            },
-                            body: JSON.stringify({
-                                pdi: 'Sim',
-                                updated_at: new Date().toISOString()
-                            })
-                        });
-                    }
+                    // Atualizar também o estoque com Status PDI (Sim/Não)
+                    await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                        },
+                        body: JSON.stringify({
+                            pdi: status === 'Sim' ? 'Sim' : 'Não',
+                            updated_at: new Date().toISOString()
+                        })
+                    });
                     
                     showToast('PDI atualizado com sucesso!', 'success');
                     closeGerenciarPDIModal();
-                    loadPDIData(); // Recarregar dados
+                    loadPDIData();
+                    loadTableData('estoque');
                 } else {
                     const error = await response.text();
                     showToast(`Erro ao atualizar PDI: ${error}`, 'error');
@@ -4285,6 +4296,16 @@
                                 
                                 if (createResponse.ok) {
                                     console.log('Item migrado para PDI com sucesso');
+                                    // Deixa Status PDI em branco inicialmente
+                                    await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nPedido}&serie=eq.${serie}`, {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'apikey': SUPABASE_ANON_KEY,
+                                            'Content-Type': 'application/json',
+                                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                                        },
+                                        body: JSON.stringify({ pdi: null, updated_at: new Date().toISOString() })
+                                    });
                                 } else {
                                     console.error('Erro ao criar registro PDI');
                                 }
@@ -4313,6 +4334,7 @@
                     const pdiData = await pdiResponse.json();
                     if (pdiData.length > 0) {
                         showNotification(`⚠️ Existem ${pdiData.length} PDIs aguardando programação há mais de 24h.`, 'warning');
+                        await sendEmailAlerts('pdi', pdiData.length);
                     }
                 }
                 
@@ -4328,6 +4350,7 @@
                     const entregaData = await entregaResponse.json();
                     if (entregaData.length > 0) {
                         showNotification(`⚠️ Há ${entregaData.length} entregas técnicas há mais de 24h sem agendamento.`, 'warning');
+                        await sendEmailAlerts('entrega', entregaData.length);
                     }
                 }
                 
@@ -4377,6 +4400,45 @@
         function checkNotificationsOnLoad() {
             if (appState.currentUser && (appState.currentUser.setor === 'posvenda' || appState.currentUser.setor === 'ambos')) {
                 checkNotifications();
+                // Agenda checagem periódica (a cada 30 min)
+                if (!window.__notificationsInterval) {
+                    window.__notificationsInterval = setInterval(checkNotifications, 30 * 60 * 1000);
+                }
+            }
+        }
+
+        async function sendEmailAlerts(type, count) {
+            try {
+                // Busca lista de e-mails ativos para o tipo solicitado
+                const filter = type === 'ambos' ? '' : `?notification_type=in.("${type}","ambos")&active=eq.true`;
+                const cfgRes = await fetch(`${SUPABASE_URL}/rest/v1/notification_config${filter}`, {
+                    headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                });
+                if (!cfgRes.ok) return;
+                const cfgs = await cfgRes.json();
+                if (!cfgs || cfgs.length === 0) return;
+
+                // Se você tiver uma edge function, ajuste a URL abaixo.
+                // Aqui usamos a tabela outbox (se existir) como fallback simples.
+                for (const cfg of cfgs) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/email_outbox`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({
+                            to: cfg.email,
+                            subject: type === 'pdi' ? 'Alerta: PDI pendente' : 'Alerta: Entrega Técnica pendente',
+                            body: `Há ${count} ${type === 'pdi' ? 'PDI(s)' : 'entrega(s) técnica(s)'} pendente(s) há mais de 24h.`,
+                            created_at: new Date().toISOString()
+                        })
+                    });
+                }
+            } catch (e) {
+                console.warn('Falha ao enfileirar e-mails:', e);
             }
         }
         
@@ -4439,7 +4501,7 @@
                     <td>${item.data_recebimento ? new Date(item.data_recebimento).toLocaleDateString('pt-BR') : ''}</td>
                     <td>${item.data_agendamento ? new Date(item.data_agendamento).toLocaleDateString('pt-BR') : ''}</td>
                     <td>
-                        <span class="status-badge ${item.status_entrega === 'Concluída' ? 'status-success' : item.status_entrega === 'Agendada' ? 'status-info' : 'status-warning'}">
+                        <span class="status-badge ${item.status_entrega === 'Concluída' ? 'status-success' : 'status-warning'}">
                             ${item.status_entrega || 'Pendente'}
                         </span>
                     </td>
@@ -4454,10 +4516,51 @@
                         <button class="btn btn-sm btn-primary" onclick="openAgendarEntregaModal('${item.n_pedido}', '${item.serie}')">
                             <i class="fas fa-calendar"></i> Agendar
                         </button>
+                        <button class="btn btn-sm btn-success" onclick="concluirEntrega('${item.n_pedido}', '${item.serie}')">
+                            <i class="fas fa-check"></i> Concluir
+                        </button>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        async function concluirEntrega(nPedido, serie) {
+            try {
+                showLoading(true);
+                // Atualiza o registro da entrega técnica
+                await fetch(`${SUPABASE_URL}/rest/v1/programacao_entrega_tecnica?n_pedido=eq.${nPedido}&serie=eq.${serie}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({ status_entrega: 'Concluída', updated_at: new Date().toISOString() })
+                });
+
+                // Marca Status Entrega Técnica como 'Feito' no estoque
+                await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nPedido}&serie=eq.${serie}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({ status_et: 'Feito', updated_at: new Date().toISOString() })
+                });
+
+                showToast('Entrega técnica concluída!', 'success');
+                loadEntregaTecnicaData();
+                loadTableData('estoque');
+            } catch (error) {
+                console.error('Erro ao concluir entrega técnica:', error);
+                showToast('Erro ao concluir entrega técnica.', 'error');
+            } finally {
+                showLoading(false);
+            }
         }
         
         async function migrateToEntregaTecnica(nPedido, serie) {
@@ -4515,6 +4618,17 @@
                                 
                                 if (createResponse.ok) {
                                     console.log('Item migrado para Entrega Técnica com sucesso');
+                                    // Define Status Entrega Técnica como 'Não' no estoque
+                                    await fetch(`${SUPABASE_URL}/rest/v1/estoque?n_pedido=eq.${nPedido}&serie=eq.${serie}`,
+                                    {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'apikey': SUPABASE_ANON_KEY,
+                                            'Content-Type': 'application/json',
+                                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                                        },
+                                        body: JSON.stringify({ status_et: 'Não', updated_at: new Date().toISOString() })
+                                    });
                                 } else {
                                     console.error('Erro ao criar registro de entrega técnica');
                                 }
@@ -4728,6 +4842,7 @@
         window.showDetails = showDetails;
         window.toggleNotificationConfig = toggleNotificationConfig;
         window.deleteNotificationConfig = deleteNotificationConfig;
+        window.concluirEntrega = concluirEntrega;
 
     </script>
 </body>
