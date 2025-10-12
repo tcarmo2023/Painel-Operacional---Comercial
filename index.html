@@ -3705,17 +3705,14 @@
                     const serieFilter = document.getElementById('serieFilter').value;
                     const revendaFilter = document.getElementById('revendaFilter').value;
                     
-                    if (pdiFilter) {
-                        if (pdiFilter === 'Sim') {
-                            filters.push('pdi=eq.Sim');
-                        } else if (pdiFilter === 'Não') {
-                            filters.push('or=(pdi.is.null,pdi.eq.Não)');
-                        }
-                    }
+                    // PDI é derivado (não filtra no servidor)
                     if (flagFilter) filters.push(`flag=eq.${encodeURIComponent(flagFilter)}`);
                     if (nPedidoFilter) filters.push(`n_pedido=ilike.*${nPedidoFilter}*`);
                     if (serieFilter) filters.push(`serie=ilike.*${serieFilter}*`);
                     if (revendaFilter) filters.push(`revenda=eq.${revendaFilter}`);
+                    
+                    // Armazena o filtro PDI para aplicar depois do enriquecimento
+                    appState.tables.estoque.filters._pdiClientFilter = pdiFilter;
                 }
                 
                 if (filters.length > 0) {
@@ -3774,6 +3771,15 @@
                                     status_et: statusET === 'Concluída' ? 'Feito' : 'Não'
                                 };
                             });
+                            // Filtro PDI aplicado no cliente após enriquecimento
+                            const pdiClientFilter = appState.tables.estoque.filters._pdiClientFilter;
+                            if (pdiClientFilter) {
+                                data = data.filter(row => {
+                                    if (pdiClientFilter === 'Sim') return row.pdi === 'Sim';
+                                    if (pdiClientFilter === 'Não') return !row.pdi || row.pdi === 'Não';
+                                    return true;
+                                });
+                            }
                         } catch (e) {
                             console.warn('Falha ao enriquecer Estoque com PDI/ET:', e);
                         }
