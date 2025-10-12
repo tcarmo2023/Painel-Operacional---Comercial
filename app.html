@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Normaq • Sistema</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./css/theme.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="app-header-inner">
+        <div class="brand">
+          <img src="./Nova Pasta/Imagem5.png" alt="Normaq" />
+          <div>Normaq Painel</div>
+        </div>
+        <nav class="app-nav">
+          <button class="btn nav-btn" data-nav="comercial" data-section="comercial" aria-current="page"><i class="fa-solid fa-store"></i> Comercial</button>
+          <button class="btn nav-btn" data-nav="pos" data-section="pos"><i class="fa-solid fa-screwdriver-wrench"></i> Pós‑Vendas</button>
+          <button class="btn nav-btn" data-nav="admin" data-section="admin"><i class="fa-solid fa-user-gear"></i> Admin</button>
+          <div class="btn outline" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Sair</div>
+          <div class="btn secondary" id="userName">—</div>
+        </nav>
+      </div>
+      <div class="subnav" data-section="comercial" data-view-subnav="comercial">
+        <button class="btn tab-btn" data-tab="estoque">Estoque</button>
+        <button class="btn tab-btn" data-tab="vendas">Vendas</button>
+        <button class="btn tab-btn" data-tab="pedidos">Pedidos JCB</button>
+        <button class="btn tab-btn" data-tab="novos">Novos Registros</button>
+      </div>
+      <div class="subnav" data-section="pos" data-view-subnav="pos" style="display:none;">
+        <button class="btn tab-btn" data-tab="pdi">PDI</button>
+        <button class="btn tab-btn" data-tab="entrega">Entrega Técnica</button>
+      </div>
+    </header>
+
+    <main class="app-content">
+      <section data-view="comercial" data-section="comercial">
+        <div data-tabs>
+          <div data-tab-panel="estoque" class="slide-up">
+            <div id="comercial-estoque"></div>
+          </div>
+          <div data-tab-panel="vendas" style="display:none" class="slide-up">
+            <div id="comercial-vendas"></div>
+          </div>
+          <div data-tab-panel="pedidos" style="display:none" class="slide-up">
+            <div id="comercial-pedidos"></div>
+          </div>
+          <div data-tab-panel="novos" style="display:none" class="slide-up">
+            <div id="comercial-novos"></div>
+          </div>
+        </div>
+      </section>
+
+      <section data-view="pos" data-section="pos" style="display:none;">
+        <div data-tabs>
+          <div data-tab-panel="pdi" class="slide-up">
+            <div id="pos-pdi"></div>
+          </div>
+          <div data-tab-panel="entrega" class="slide-up" style="display:none;">
+            <div id="pos-entrega"></div>
+          </div>
+        </div>
+      </section>
+
+      <section data-view="admin" data-section="admin" style="display:none;">
+        <div class="grid" style="display:grid; gap:18px; grid-template-columns: 1fr;">
+          <div id="admin-users"></div>
+          <div id="admin-alerts"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <div class="app-footer-inner">
+        <div>© 2025 NORMAQ JCB - Todos os direitos reservados • Versão 1.1</div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <span>Desenvolvido por <a href="#" onclick="event.preventDefault();">Thiago Carmo</a> – Especialista em Dados e Desenvolvedor</span>
+          <span style="display:flex; align-items:center; gap:6px;"><i class="fas fa-phone"></i> 📞 (81) 99514-3900</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module">
+    import { bootApp } from './js/app.js';
+    import './js/ui.js';
+    import './js/supabase.js';
+    import './js/views/comercial.js';
+    import './js/views/pos.js';
+    import './js/views/admin.js';
+    window.addEventListener('DOMContentLoaded', () => bootApp());
+  </script>
+</body>
+</html>
