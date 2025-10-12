@@ -3,13 +3,139 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Sistema Normaq</title>
+  <title>Normaq • Sistema (Single File)</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="./css/theme.css" />
   <style>
-    body { display: grid; min-height: 100vh; }
-    .login-container { display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, var(--jcb-orange), var(--jcb-orange-dark)); }
-    .login-box { background:#fff; width:min(440px, 92vw); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 28px 24px; margin: 24px; animation: fadeIn var(--transition-slow); }
+    /* ==== THEME / BASE ==== */
+    :root {
+      --jcb-orange: #d46b00;
+      --jcb-orange-light: #e67e22;
+      --jcb-orange-dark: #b35900;
+      --white: #ffffff;
+      --gray-50: #fafafa;
+      --gray-100: #f5f5f5;
+      --gray-200: #eeeeee;
+      --gray-300: #e0e0e0;
+      --gray-400: #bdbdbd;
+      --gray-500: #9e9e9e;
+      --gray-600: #757575;
+      --gray-700: #616161;
+      --gray-800: #424242;
+      --gray-900: #212121;
+      --gray-dark: #333333;
+      --gray-darker: #111214;
+      --success: #27ae60;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --info: #3498db;
+      --border-radius: 10px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --transition-fast: 150ms cubic-bezier(.4,0,.2,1);
+      --transition: 250ms cubic-bezier(.4,0,.2,1);
+      --transition-slow: 400ms cubic-bezier(.4,0,.2,1);
+      --shadow-sm: 0 2px 6px rgba(0,0,0,.06);
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+      --shadow-lg: 0 18px 42px rgba(0,0,0,.12);
+      --max-container: 1280px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--gray-darker); background: var(--gray-100); }
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+
+    /* Buttons */
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 18px; border:0; border-radius: var(--border-radius); background: var(--jcb-orange); color: var(--white); font-weight: 600; cursor:pointer; transition: transform var(--transition), box-shadow var(--transition), background var(--transition); box-shadow: var(--shadow-sm); }
+    .btn:hover { background: var(--jcb-orange-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
+    .btn:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
+    .btn.secondary { background: var(--gray-800); }
+    .btn.secondary:hover { background: var(--gray-900); }
+    .btn.outline { background: transparent; border: 2px solid var(--jcb-orange); color: var(--jcb-orange); }
+    .btn.outline:hover { background: rgba(212,107,0,0.08); }
+    .btn.success { background: var(--success); }
+    .btn.success:hover { background: #219653; }
+    .btn.danger { background: var(--danger); }
+    .btn.danger:hover { background: #c0392b; }
+    .btn.block { width: 100%; }
+
+    /* Inputs */
+    .input, .select, .textarea { width:100%; padding:12px 14px; border:1px solid var(--gray-300); border-radius: var(--border-radius); background:#fff; transition: border-color var(--transition), box-shadow var(--transition); font-size:15px; }
+    .input:focus, .select:focus, .textarea:focus { outline:none; border-color: var(--jcb-orange); box-shadow: 0 0 0 3px rgba(212,107,0,0.18); }
+    .label { font-weight: 600; color: var(--gray-800); margin-bottom: 6px; display:block; }
+
+    /* Cards */
+    .card { background:#fff; border-radius: var(--radius-md); box-shadow: var(--shadow); padding: 18px; }
+    .card-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+    .card-title { font-size: 18px; font-weight: 700; color: var(--gray-900); }
+
+    /* Tables */
+    .table-wrapper { width:100%; overflow:auto; border-radius: var(--radius-md); box-shadow: var(--shadow); background:#fff; }
+    .table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .table th, .table td { padding:12px 14px; border-bottom: 1px solid var(--gray-200); white-space: nowrap; font-size: 14px; }
+    .table th { position: sticky; top: 0; background: #fff7f0; color: #5a2d00; text-align:left; border-bottom: 2px solid #ffd7b0; z-index:1; }
+    .table tr:hover td { background:#fffaf4; }
+    .badge { padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; display:inline-block; }
+    .badge.success { background:#e8f8ef; color:#1f9254; }
+    .badge.warning { background:#fff4e5; color:#b4690e; }
+    .badge.danger { background:#fdecef; color:#c81e1e; }
+    .badge.info { background:#e8f1fd; color:#1e56c8; }
+
+    /* Layout Shell */
+    .app-shell { min-height: 100vh; display:grid; grid-template-rows: auto 1fr auto; }
+    .app-header { background: linear-gradient(90deg, var(--jcb-orange), var(--jcb-orange-dark)); color: var(--white); box-shadow: var(--shadow-lg); }
+    .app-header-inner { max-width: var(--max-container); margin:0 auto; padding: 14px 20px; display:flex; align-items:center; gap:16px; }
+    .brand { display:flex; align-items:center; gap: 10px; font-weight: 800; letter-spacing: .3px; }
+    .brand img { height: 40px; width:auto; border-radius:6px; box-shadow: var(--shadow-sm); background: rgba(255,255,255,.85); padding: 4px; }
+    .app-nav { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+    .nav-btn { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); }
+    .nav-btn[aria-current="page"] { background: rgba(0,0,0,.2); }
+
+    .subnav { max-width: var(--max-container); margin: 10px auto 0; padding: 0 20px 14px; display:flex; gap:8px; flex-wrap:wrap; }
+    .subnav .tab-btn { background:#fff; color: var(--gray-900); border: 1px solid var(--gray-300); }
+    .subnav .tab-btn[aria-selected="true"] { border-color: var(--jcb-orange); box-shadow: 0 0 0 3px rgba(212,107,0,0.18); }
+
+    .app-content { max-width: var(--max-container); width:100%; margin: 0 auto; padding: 20px; }
+    .app-footer { background: var(--gray-darker); color: var(--white); }
+    .app-footer-inner { max-width: var(--max-container); margin:0 auto; padding:16px 20px; font-size:14px; display:grid; gap:8px; }
+
+    /* Filters */
+    .filters { display:grid; grid-template-columns: repeat(12, 1fr); gap:10px; margin-bottom:14px; }
+    .filters .field { grid-column: span 3; display:flex; flex-direction:column; gap:6px; }
+    .filters .actions { grid-column: span 12; display:flex; gap:8px; justify-content:flex-end; }
+    @media (max-width: 960px) { .filters .field { grid-column: span 6; } }
+    @media (max-width: 600px) { .filters .field { grid-column: span 12; } }
+
+    /* Animations */
+    .fade-in { animation: fadeIn var(--transition-slow); }
+    .slide-up { animation: slideUp var(--transition-slow); }
+    @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+    @keyframes slideUp { from { opacity:0; transform: translateY(12px) } to { opacity:1; transform: translateY(0) } }
+
+    /* Toasts & Overlays */
+    .toast-container { position: fixed; top: 18px; right: 18px; z-index: 2000; display:grid; gap:10px; }
+    .toast { background:#fff; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); padding: 14px 16px; display:flex; align-items: flex-start; gap:12px; min-width: 320px; border-left: 5px solid var(--info); }
+    .toast .title { font-weight: 800; }
+    .toast .message { color: var(--gray-700); font-size: 14px; }
+    .toast.success { border-left-color: var(--success); }
+    .toast.error { border-left-color: var(--danger); }
+    .toast.warning { border-left-color: var(--warning); }
+
+    .modal-overlay { position: fixed; inset:0; background: rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:3000; backdrop-filter: blur(4px); }
+    .modal { width: min(620px, 92vw); max-height: 90vh; overflow:auto; background:#fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); transform: translateY(10px) scale(.98); opacity: 0; transition: all var(--transition); }
+    .modal.open { transform: translateY(0) scale(1); opacity:1; }
+    .modal-header { border-bottom: 1px solid var(--gray-200); padding:16px 18px; display:flex; justify-content:space-between; align-items:center; }
+    .modal-body { padding:16px 18px; display:grid; gap:10px; }
+    .modal-footer { border-top: 1px solid var(--gray-200); padding:14px 18px; display:flex; justify-content:flex-end; gap:10px; }
+
+    .loading-overlay { position: fixed; inset:0; background: rgba(255,255,255,.7); display:none; align-items:center; justify-content:center; z-index:2500; }
+    .spinner { width:48px; height:48px; border:4px solid rgba(212,107,0,.2); border-left:4px solid var(--jcb-orange); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Login visuals */
+    .login-container { display:flex; align-items:center; justify-content:center; min-height: 100vh; background: linear-gradient(135deg, var(--jcb-orange), var(--jcb-orange-dark)); }
+    .login-box { background:#fff; width:min(460px, 92vw); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 28px 24px; margin: 24px; animation: fadeIn var(--transition-slow); }
     .login-logo { text-align:center; margin-bottom: 16px; }
     .login-logo img { height: 60px; margin: 0 auto 10px; border-radius: 10px; background: #fff; padding: 6px; box-shadow: var(--shadow-sm); }
     .login-logo h1 { color: var(--jcb-orange); font-size: 24px; display:flex; gap:8px; align-items:center; justify-content:center; }
@@ -18,6 +144,7 @@
   </style>
 </head>
 <body>
+  <!-- Login Screen -->
   <div id="loginScreen" class="login-container">
     <div class="login-box">
       <div class="login-logo">
@@ -43,10 +170,12 @@
     </div>
   </div>
 
+  <!-- Change Password Modal -->
   <div class="modal-overlay" id="changePasswordModal" style="display:none;">
-    <div class="modal open">
+    <div class="modal">
       <div class="modal-header">
         <div class="card-title">Alteração de Senha Obrigatória</div>
+        <button class="btn outline" data-close-change>&times;</button>
       </div>
       <div class="modal-body">
         <form id="changePasswordForm" class="grid" style="display:grid; gap:10px;">
@@ -61,20 +190,550 @@
     </div>
   </div>
 
-  <footer class="app-footer">
-    <div class="app-footer-inner">
-      <div>© 2025 NORMAQ JCB - Todos os direitos reservados • Versão 1.1</div>
-      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-        <span>Desenvolvido por <a href="#" onclick="event.preventDefault();">Thiago Carmo</a> – Especialista em Dados e Desenvolvedor</span>
-        <span style="display:flex; align-items:center; gap:6px;"><i class="fas fa-phone"></i> 📞 (81) 99514-3900</span>
+  <!-- App Shell (hidden until login) -->
+  <div id="appShell" class="app-shell" style="display:none;">
+    <header class="app-header">
+      <div class="app-header-inner">
+        <div class="brand">
+          <img src="./Nova Pasta/Imagem5.png" alt="Normaq" />
+          <div>Normaq Painel</div>
+        </div>
+        <nav class="app-nav">
+          <button class="btn nav-btn" data-nav="comercial" aria-current="page"><i class="fa-solid fa-store"></i> Comercial</button>
+          <button class="btn nav-btn" data-nav="pos"><i class="fa-solid fa-screwdriver-wrench"></i> Pós‑Vendas</button>
+          <button class="btn nav-btn" data-nav="admin" data-section="admin"><i class="fa-solid fa-user-gear"></i> Admin</button>
+          <div class="btn outline" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Sair</div>
+          <div class="btn secondary" id="userName">—</div>
+        </nav>
       </div>
-    </div>
-  </footer>
+      <div class="subnav" data-section="comercial" data-view-subnav="comercial">
+        <button class="btn tab-btn" data-tab="estoque">Estoque</button>
+        <button class="btn tab-btn" data-tab="vendas">Vendas</button>
+        <button class="btn tab-btn" data-tab="pedidos">Pedidos JCB</button>
+        <button class="btn tab-btn" data-tab="novos">Novos Registros</button>
+      </div>
+      <div class="subnav" data-section="pos" data-view-subnav="pos" style="display:none;">
+        <button class="btn tab-btn" data-tab="pdi">PDI</button>
+        <button class="btn tab-btn" data-tab="entrega">Entrega Técnica</button>
+      </div>
+    </header>
+
+    <main class="app-content">
+      <section data-view="comercial" data-section="comercial">
+        <div data-tabs>
+          <div data-tab-panel="estoque" class="slide-up">
+            <div id="comercial-estoque"></div>
+          </div>
+          <div data-tab-panel="vendas" style="display:none" class="slide-up">
+            <div id="comercial-vendas"></div>
+          </div>
+          <div data-tab-panel="pedidos" style="display:none" class="slide-up">
+            <div id="comercial-pedidos"></div>
+          </div>
+          <div data-tab-panel="novos" style="display:none" class="slide-up">
+            <div id="comercial-novos"></div>
+          </div>
+        </div>
+      </section>
+
+      <section data-view="pos" data-section="pos" style="display:none;">
+        <div data-tabs>
+          <div data-tab-panel="pdi" class="slide-up">
+            <div id="pos-pdi"></div>
+          </div>
+          <div data-tab-panel="entrega" class="slide-up" style="display:none;">
+            <div id="pos-entrega"></div>
+          </div>
+        </div>
+      </section>
+
+      <section data-view="admin" data-section="admin" style="display:none;">
+        <div class="grid" style="display:grid; gap:18px; grid-template-columns: 1fr;">
+          <div id="admin-users"></div>
+          <div id="admin-alerts"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <div class="app-footer-inner">
+        <div>© 2025 NORMAQ JCB - Todos os direitos reservados • Versão 1.1</div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <span>Desenvolvido por <a href="#" onclick="event.preventDefault();">Thiago Carmo</a> – Especialista em Dados e Desenvolvedor</span>
+          <span style="display:flex; align-items:center; gap:6px;"><i class="fas fa-phone"></i> 📞 (81) 99514-3900</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Utility containers -->
+  <div class="toast-container" id="toastContainer"></div>
+  <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
 
   <script type="module">
-    import './js/ui.js';
-    import './js/supabase.js';
-    import './js/login.js';
+    // ===== UI Utilities =====
+    const UI = (() => {
+      const toastContainer = document.getElementById('toastContainer');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      function showToast(message, type = 'info', title) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <div class="content">
+            <div class="title">${title || (type === 'success' ? 'Sucesso' : type === 'error' ? 'Erro' : type === 'warning' ? 'Aviso' : 'Informação')}</div>
+            <div class="message">${message}</div>
+          </div>
+          <button class="btn outline" aria-label="Fechar">&times;</button>
+        `;
+        toast.querySelector('button').addEventListener('click', () => toast.remove());
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 5500);
+      }
+      function showLoading(show) { loadingOverlay.style.display = show ? 'flex' : 'none'; }
+      function openModal(el) { el.style.display = 'flex'; const p = el.querySelector('.modal'); requestAnimationFrame(()=> p.classList.add('open')); }
+      function closeModal(el) { const p = el.querySelector('.modal'); p.classList.remove('open'); setTimeout(()=> el.style.display='none', 200); }
+      function formatDateISO(date) { if (!date) return ''; const d = new Date(date); if (Number.isNaN(d.getTime())) return ''; return d.toISOString().slice(0,10); }
+      return { showToast, showLoading, openModal, closeModal, formatDateISO };
+    })();
+
+    // ===== Supabase REST Helpers =====
+    const Config = {
+      supabaseUrl: 'https://vukpgdftmtuxibnkszil.supabase.co',
+      supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ1a3BnZGZ0bXR1eGlibmtzemlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwODk4NDIsImV4cCI6MjA3NTY2NTg0Mn0.4U8uYaOtbFH0GGn1gMPirWa4koslor_3feW7wapxpmw',
+      tables: {
+        usuarios: 'usuarios',
+        estoque: 'estoque',
+        vendas: 'vendas',
+        pedidos: 'pedidos_jcb',
+        pdi: 'pdi',
+        entrega: 'entrega_tecnica',
+        alertSettings: 'alert_settings',
+      }
+    };
+    function headersJSON() { return { 'apikey': Config.supabaseAnonKey, 'Authorization': `Bearer ${Config.supabaseAnonKey}`, 'Content-Type': 'application/json', 'Prefer':'return=representation' }; }
+    async function apiGet(table, { select='*', filters=[], orderBy } = {}) {
+      const params = [`select=${encodeURIComponent(select)}`];
+      if (Array.isArray(filters)) params.push(...filters);
+      if (orderBy) params.push(`order=${orderBy}`);
+      const url = `${Config.supabaseUrl}/rest/v1/${table}?${params.join('&')}`;
+      const res = await fetch(url, { headers: headersJSON(), method:'GET' });
+      if (!res.ok) throw new Error(`GET ${table} failed: ${await res.text()}`);
+      return await res.json();
+    }
+    async function apiInsert(table, payload) {
+      const res = await fetch(`${Config.supabaseUrl}/rest/v1/${table}`, { method:'POST', headers: headersJSON(), body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error(`INSERT ${table} failed: ${await res.text()}`);
+      return await res.json();
+    }
+    async function apiUpdate(table, matchFilter, payload) {
+      const filters = Object.entries(matchFilter).map(([k,v]) => `${encodeURIComponent(k)}=eq.${encodeURIComponent(v)}`);
+      const url = `${Config.supabaseUrl}/rest/v1/${table}?${filters.join('&')}`;
+      const res = await fetch(url, { method:'PATCH', headers: headersJSON(), body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error(`UPDATE ${table} failed: ${await res.text()}`);
+      return await res.json();
+    }
+
+    // ===== App State & Navigation =====
+    const AppState = { currentUser: null };
+    function saveUser(u){ localStorage.setItem('normaqUser', JSON.stringify(u)); }
+    function loadSavedUser(){ try { return JSON.parse(localStorage.getItem('normaqUser')||'null'); } catch { return null; } }
+
+    function showLogin(){ document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('appShell').style.display = 'none'; }
+    function showApp(){ document.getElementById('loginScreen').style.display = 'none'; document.getElementById('appShell').style.display = 'grid'; bootAppOnce(); }
+
+    function logout(){ localStorage.removeItem('normaqUser'); showLogin(); }
+
+    function applyRoleVisibility() {
+      const isAdmin = AppState.currentUser?.role === 'admin' || AppState.currentUser?.role === 'Administrador';
+      const setor = (AppState.currentUser?.setor || 'ambos').toLowerCase();
+      document.querySelectorAll('[data-section]')?.forEach(el => {
+        const section = el.getAttribute('data-section');
+        let visible = false;
+        if (section === 'admin') visible = isAdmin;
+        if (section === 'comercial') visible = setor === 'comercial' || setor === 'ambos' || isAdmin;
+        if (section === 'pos') visible = setor === 'pós-vendas' || setor === 'pos' || setor === 'ambos' || isAdmin;
+        el.style.display = visible ? '' : 'none';
+      });
+    }
+
+    function initNav(){
+      const navBtns = document.querySelectorAll('[data-nav]');
+      navBtns.forEach(btn => btn.addEventListener('click', () => {
+        const view = btn.getAttribute('data-nav');
+        showView(view);
+        navBtns.forEach(b => b.removeAttribute('aria-current'));
+        btn.setAttribute('aria-current','page');
+      }));
+    }
+
+    function initTabs(container){
+      container.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tab = btn.dataset.tab;
+          container.querySelectorAll('.tab-btn').forEach(b => b.removeAttribute('aria-selected'));
+          btn.setAttribute('aria-selected','true');
+          container.querySelectorAll('[data-tab-panel]')?.forEach(p => { p.style.display='none'; });
+          const panel = container.querySelector(`[data-tab-panel="${tab}"]`);
+          if (panel) panel.style.display = '';
+          container.dispatchEvent(new CustomEvent('tabchange', { detail: { tab, container } }));
+        });
+      });
+    }
+
+    function showView(view){
+      document.querySelectorAll('[data-view]')?.forEach(el => { el.style.display = 'none'; });
+      const target = document.querySelector(`[data-view="${view}"]`);
+      if (target) target.style.display = '';
+      const subCom = document.querySelector('[data-view-subnav="comercial"]');
+      const subPos = document.querySelector('[data-view-subnav="pos"]');
+      if (view === 'comercial') { if (subCom) subCom.style.display = ''; if (subPos) subPos.style.display = 'none'; }
+      else if (view === 'pos') { if (subCom) subCom.style.display='none'; if (subPos) subPos.style.display=''; }
+      else { if (subCom) subCom.style.display = 'none'; if (subPos) subPos.style.display='none'; }
+      const firstTab = target?.querySelector('.subnav .tab-btn');
+      if (firstTab) firstTab.click();
+    }
+
+    let booted = false;
+    function bootAppOnce(){
+      if (booted) return; booted = true;
+      document.getElementById('userName').textContent = AppState.currentUser?.nome || AppState.currentUser?.email || '—';
+      document.getElementById('logoutBtn').addEventListener('click', logout);
+      applyRoleVisibility();
+      initNav();
+      document.querySelectorAll('[data-tabs]')?.forEach(initTabs);
+      wireComercial(); wirePOS(); wireAdmin();
+      const firstVisibleNav = Array.from(document.querySelectorAll('[data-nav]')).find(btn => getComputedStyle(btn).display !== 'none');
+      if (firstVisibleNav) firstVisibleNav.click();
+    }
+
+    // ===== Login Logic =====
+    async function verifyPassword(inputPassword, user){ if (user.senha_temporaria && inputPassword === user.senha_temporaria) return true; return inputPassword === user.senha_hash; }
+    async function authenticateUser(email, password){
+      if (email === 'adm.thiago@normaq.com.br' && password === 'NMQ@2025') {
+        return { success:true, user: { id: 0, nome:'Administrador', email, role:'admin', setor:'ambos', senha_temporaria:false } };
+      }
+      const res = await fetch(`${Config.supabaseUrl}/rest/v1/${Config.tables.usuarios}?email=eq.${encodeURIComponent(email)}&ativo=eq.true`, { headers: headersJSON() });
+      if (!res.ok) throw new Error('Falha na consulta');
+      const users = await res.json();
+      const user = users?.[0];
+      if (!user) return { success:false, message:'Usuário não encontrado' };
+      const ok = await verifyPassword(password, user);
+      if (!ok) return { success:false, message:'Senha incorreta' };
+      return { success:true, user: { id:user.id, nome:user.nome, email:user.email, role:user.role, setor:user.setor, senha_temporaria:user.senha_temporaria } };
+    }
+    function showChangePassword(){ UI.openModal(document.getElementById('changePasswordModal')); document.getElementById('loginScreen').style.display = 'none'; }
+
+    async function handleLogin(e){
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      if (!email || !password) { UI.showToast('Preencha todos os campos.', 'error'); return; }
+      if (!email.endsWith('@normaq.com.br')) { UI.showToast('Apenas e-mails @normaq.com.br são permitidos.', 'error'); return; }
+      try {
+        UI.showLoading(true);
+        const auth = await authenticateUser(email, password);
+        if (!auth.success) { UI.showToast(auth.message || 'Credenciais inválidas', 'error'); return; }
+        AppState.currentUser = auth.user; saveUser(auth.user);
+        if (auth.user.senha_temporaria) showChangePassword(); else showApp();
+        UI.showToast('Login realizado com sucesso!', 'success');
+      } catch (err) { console.error(err); UI.showToast('Erro ao conectar com o servidor.', 'error'); }
+      finally { UI.showLoading(false); }
+    }
+
+    async function handleChangePassword(){
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      if (newPassword !== confirmPassword) { UI.showToast('As senhas não coincidem.', 'error'); return; }
+      if (newPassword.length < 6) { UI.showToast('A senha deve ter pelo menos 6 caracteres.', 'error'); return; }
+      const user = loadSavedUser();
+      try {
+        UI.showLoading(true);
+        const reauth = await authenticateUser(user.email, currentPassword);
+        if (!reauth.success) { UI.showToast('Senha temporária incorreta.', 'error'); return; }
+        await apiUpdate(Config.tables.usuarios, { id: user.id }, { senha_hash: newPassword, senha_temporaria: false });
+        const updated = { ...user, senha_temporaria:false }; AppState.currentUser = updated; saveUser(updated);
+        UI.closeModal(document.getElementById('changePasswordModal'));
+        showApp();
+        UI.showToast('Senha alterada com sucesso!', 'success');
+      } catch (err) { console.error(err); UI.showToast('Erro ao alterar senha.', 'error'); }
+      finally { UI.showLoading(false); }
+    }
+
+    // ===== Comercial Views =====
+    function mountFilters(container, fields){
+      const wrap = document.createElement('div'); wrap.className = 'card filters';
+      fields.forEach(f => { const field = document.createElement('div'); field.className = 'field'; field.innerHTML = `<label class="label">${f.label}</label>`; let input; if (f.type === 'select'){ input = document.createElement('select'); input.className='select'; (f.options||[]).forEach(opt => { const o=document.createElement('option'); o.value=opt.value; o.textContent=opt.label; input.appendChild(o); }); } else { input = document.createElement('input'); input.className='input'; input.type = f.type || 'text'; input.placeholder = f.placeholder || ''; } input.name = f.name; field.appendChild(input); wrap.appendChild(field); });
+      const actions = document.createElement('div'); actions.className='actions'; actions.innerHTML = `<button class="btn outline" data-action="clear"><i class="fa-solid fa-eraser"></i> Limpar</button><button class="btn" data-action="apply"><i class="fa-solid fa-filter"></i> Filtrar</button>`; wrap.appendChild(actions); container.appendChild(wrap); return wrap;
+    }
+    function renderTable(container, columns, rows){
+      const wrapper = document.createElement('div'); wrapper.className='table-wrapper fade-in';
+      const table = document.createElement('table'); table.className='table';
+      const thead = document.createElement('thead'); const trh = document.createElement('tr'); columns.forEach(c => { const th = document.createElement('th'); th.textContent = c.label; trh.appendChild(th); }); thead.appendChild(trh); table.appendChild(thead);
+      const tbody = document.createElement('tbody'); rows.forEach(row => { const tr = document.createElement('tr'); columns.forEach(c => { const td = document.createElement('td'); const value = typeof c.format === 'function' ? c.format(row[c.key], row) : row[c.key]; td.innerHTML = value ?? ''; tr.appendChild(td); }); tbody.appendChild(tr); }); table.appendChild(tbody); wrapper.appendChild(table); container.appendChild(wrapper); return { wrapper, table };
+    }
+
+    async function loadEstoque(container){
+      container.innerHTML = '';
+      const cols = [
+        { key:'revenda', label:'Revenda' },
+        { key:'numero_pedido', label:'Nº Pedido' },
+        { key:'status_pdi', label:'Status PDI', format:(v)=>`<span class="badge ${v==='Sim'?'success':v==='Não'?'warning':'info'}">${v||'—'}</span>` },
+        { key:'status_entrega_tecnica', label:'Status Entrega Tecnica', format:(v)=>`<span class="badge ${v==='Feito'?'success':v==='Pendente'?'warning':'info'}">${v||'—'}</span>` },
+        { key:'cliente', label:'Cliente' },
+        { key:'qtde', label:'Qtde' },
+        { key:'modelo', label:'Modelo' },
+        { key:'localizacao', label:'Localização' },
+        { key:'dias_faturado_fabrica', label:'Dias Fat. Fabrica' },
+        { key:'status_pagamento', label:'Status Pagamento' },
+        { key:'ano', label:'Ano' },
+        { key:'previsao_chegada', label:'Previsão Chegada' },
+        { key:'chegada_patio', label:'Chegada Patio' },
+        { key:'data_venda', label:'Data Venda' },
+        { key:'status_maq', label:'Status Maq.' }
+      ];
+      const filterBar = mountFilters(container, [
+        { name:'pdi', label:'PDI', type:'select', options:[{value:'',label:'Todos'},{value:'Sim',label:'Sim'},{value:'Não',label:'Não'}] },
+        { name:'status_pagamento', label:'Status Pagamento', type:'text', placeholder:'Ex.: Pago' },
+        { name:'numero_pedido', label:'Nº Pedido', type:'text' },
+        { name:'serie', label:'Série', type:'text' },
+        { name:'revenda', label:'Revenda', type:'text' },
+        { name:'chegada_patio', label:'Data (Chegada Patio) de', type:'date' },
+        { name:'chegada_patio_ate', label:'Data (Chegada Patio) até', type:'date' },
+        { name:'ano', label:'Ano', type:'number' }
+      ]);
+      async function query(){
+        try{
+          UI.showLoading(true);
+          const fields = Object.fromEntries([...filterBar.querySelectorAll('.field .input, .field .select')].map(i=>[i.name,i.value]));
+          const filters = [];
+          if (fields.pdi) filters.push(`status_pdi=eq.${encodeURIComponent(fields.pdi)}`);
+          if (fields.status_pagamento) filters.push(`status_pagamento=ilike.*${encodeURIComponent(fields.status_pagamento)}*`);
+          if (fields.numero_pedido) filters.push(`numero_pedido=ilike.*${encodeURIComponent(fields.numero_pedido)}*`);
+          if (fields.serie) filters.push(`serie=ilike.*${encodeURIComponent(fields.serie)}*`);
+          if (fields.revenda) filters.push(`revenda=ilike.*${encodeURIComponent(fields.revenda)}*`);
+          if (fields.ano) filters.push(`ano=eq.${encodeURIComponent(fields.ano)}`);
+          if (fields.chegada_patio) filters.push(`chegada_patio=gte.${encodeURIComponent(fields.chegada_patio)}`);
+          if (fields.chegada_patio_ate) filters.push(`chegada_patio=lte.${encodeURIComponent(fields.chegada_patio_ate)}`);
+          const url = new URL(`${Config.supabaseUrl}/rest/v1/${Config.tables.estoque}`);
+          url.searchParams.set('select','*'); filters.forEach(f=> url.searchParams.append(f,'')); url.searchParams.append('order','chegada_patio.desc');
+          const res = await fetch(url.toString(), { headers: { 'apikey': Config.supabaseAnonKey, 'Authorization': `Bearer ${Config.supabaseAnonKey}` } });
+          if (!res.ok) throw new Error(await res.text());
+          const data = await res.json();
+          container.querySelectorAll('.table-wrapper').forEach(e=> e.remove());
+          renderTable(container, cols, data.map(r=>({
+            revenda:r.revenda, numero_pedido:r.numero_pedido, status_pdi:r.status_pdi || (r.status_pdi===false?'Não':r.status_pdi), status_entrega_tecnica:r.status_entrega_tecnica, cliente:r.cliente, qtde:r.qtde, modelo:r.modelo, localizacao:r.localizacao, dias_faturado_fabrica:r.dias_faturado_fabrica, status_pagamento:r.status_pagamento, ano:r.ano, previsao_chegada:r.previsao_chegada, chegada_patio:r.chegada_patio, data_venda:r.data_venda, status_maq:r.status_maq
+          })));
+          const actions = document.createElement('div'); actions.style='margin-top:12px; display:flex; justify-content:flex-end;'; actions.innerHTML = `<button class="btn" id="btnAjuste"><i class=\"fa-solid fa-sliders\"></i> Ajustar Status</button>`; container.appendChild(actions);
+          document.getElementById('btnAjuste').addEventListener('click', ()=> openAjusteModal());
+        } catch(err){ console.error(err); UI.showToast('Erro ao carregar estoque','error'); }
+        finally { UI.showLoading(false); }
+      }
+      filterBar.querySelector('[data-action="apply"]').addEventListener('click', query);
+      filterBar.querySelector('[data-action="clear"]').addEventListener('click', ()=> { filterBar.querySelectorAll('input,select').forEach(i=> i.value=''); query(); });
+      query();
+
+      function openAjusteModal(){
+        const overlay = document.createElement('div'); overlay.className='modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal">
+            <div class="modal-header"><div class="card-title">Ajuste de Status</div><button class="btn outline" data-close>&times;</button></div>
+            <div class="modal-body">
+              <div class="field"><label class="label">Nº Pedido</label><input class="input" name="numero_pedido"></div>
+              <div class="field"><label class="label">Localização</label>
+                <select class="select" name="localizacao">
+                  <option value="Em Trânsito">Em Trânsito</option>
+                  <option value="Maquina no Patio">Maquina no Patio</option>
+                  <option value="Cliente">Cliente</option>
+                </select>
+              </div>
+              <div class="field"><label class="label">Status Maq.</label>
+                <select class="select" name="status_maq">
+                  <option value="Em Trânsito">Em Trânsito</option>
+                  <option value="Estoque">Estoque</option>
+                  <option value="Entrega ao Cliente">Entrega ao Cliente</option>
+                </select>
+              </div>
+              <div class="field"><label class="label">Cliente</label><input class="input" name="cliente"></div>
+            </div>
+            <div class="modal-footer"><button class="btn outline" data-close>Cancelar</button><button class="btn success" data-save>Salvar</button></div>
+          </div>`;
+        document.body.appendChild(overlay);
+        const panel = overlay.querySelector('.modal'); panel.classList.add('open');
+        overlay.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', ()=> overlay.remove()));
+        overlay.querySelector('[data-save]').addEventListener('click', async ()=>{
+          const np = overlay.querySelector('input[name="numero_pedido"]').value?.trim();
+          const loc = overlay.querySelector('select[name="localizacao"]').value;
+          const sm = overlay.querySelector('select[name="status_maq"]').value;
+          const cliente = overlay.querySelector('input[name="cliente"]').value?.trim();
+          if (!np) { UI.showToast('Informe o Nº Pedido', 'warning'); return; }
+          try {
+            UI.showLoading(true);
+            const getUrl = new URL(`${Config.supabaseUrl}/rest/v1/${Config.tables.estoque}`);
+            getUrl.searchParams.set('select','*'); getUrl.searchParams.append(`numero_pedido=eq.${encodeURIComponent(np)}`,'');
+            const exRes = await fetch(getUrl.toString(), { headers: { 'apikey': Config.supabaseAnonKey, 'Authorization': `Bearer ${Config.supabaseAnonKey}` } });
+            const ex = exRes.ok ? (await exRes.json())[0] : null;
+            await apiUpdate(Config.tables.estoque, { numero_pedido: np }, { localizacao: loc, status_maq: sm, cliente });
+            if (loc === 'Maquina no Patio') {
+              try { await apiInsert(Config.tables.pdi, { revenda: ex?.revenda||null, numero_pedido: np, serie: ex?.serie||null, modelo: ex?.modelo||null, cliente: cliente || ex?.cliente || null, data_maq_patio: new Date().toISOString().slice(0,10), status_pdi: 'Não' }); } catch(_){ }
+            }
+            if (sm === 'Entrega ao Cliente') {
+              try { await apiInsert(Config.tables.entrega, { revenda: ex?.revenda||null, numero_pedido: np, serie: ex?.serie||null, modelo: ex?.modelo||null, cliente: cliente || ex?.cliente || null, status_entrega: 'Pendente' }); } catch(_){ }
+            }
+            UI.showToast('Atualizado com sucesso!','success'); overlay.remove(); loadEstoque(container);
+          } catch(err){ console.error(err); UI.showToast('Falha ao atualizar','error'); }
+          finally { UI.showLoading(false); }
+        });
+      }
+    }
+
+    async function loadVendas(container){
+      container.innerHTML = '';
+      const cols = [
+        { key:'revenda', label:'Revenda' }, { key:'numero_pedido', label:'Nº Pedido' }, { key:'serie', label:'Série' }, { key:'data_venda', label:'Data Venda' }, { key:'cliente', label:'Cliente' }, { key:'qtde', label:'Qtde' }, { key:'modelo', label:'Modelo' }, { key:'localizacao', label:'Localização' }, { key:'status_pagamento', label:'Status Pagamento' }
+      ];
+      const filterBar = mountFilters(container, [ {name:'revenda',label:'Revenda',type:'text'}, {name:'numero_pedido',label:'Nº Pedido',type:'text'}, {name:'status_pagamento',label:'Status Pagamento',type:'text'}, {name:'data_venda',label:'Data Venda',type:'date'} ]);
+      async function query(){ try{ UI.showLoading(true); const f = Object.fromEntries([...filterBar.querySelectorAll('.field .input, .field .select')].map(i=>[i.name,i.value])); const filters=[]; if (f.revenda) filters.push(`revenda=ilike.*${encodeURIComponent(f.revenda)}*`); if (f.numero_pedido) filters.push(`numero_pedido=ilike.*${encodeURIComponent(f.numero_pedido)}*`); if (f.status_pagamento) filters.push(`status_pagamento=ilike.*${encodeURIComponent(f.status_pagamento)}*`); if (f.data_venda) filters.push(`data_venda=eq.${encodeURIComponent(f.data_venda)}`); const url = new URL(`${Config.supabaseUrl}/rest/v1/${Config.tables.vendas}`); url.searchParams.set('select','*'); filters.forEach(x=> url.searchParams.append(x,'')); url.searchParams.append('order','data_venda.desc'); const res=await fetch(url.toString(), { headers:{'apikey':Config.supabaseAnonKey,'Authorization':`Bearer ${Config.supabaseAnonKey}`} }); if(!res.ok) throw new Error(await res.text()); const data=await res.json(); container.querySelectorAll('.table-wrapper').forEach(e=>e.remove()); renderTable(container, cols, data); } catch(err){ console.error(err); UI.showToast('Erro ao carregar vendas','error'); } finally{ UI.showLoading(false); } }
+      filterBar.querySelector('[data-action="apply"]').addEventListener('click', query);
+      filterBar.querySelector('[data-action="clear"]').addEventListener('click', ()=> { filterBar.querySelectorAll('input,select').forEach(i=> i.value=''); query(); });
+      query();
+    }
+
+    async function loadPedidos(container){
+      container.innerHTML = '';
+      const cols = [ {key:'numero_pedido',label:'Nº Pedido'}, {key:'modelo',label:'Modelo'}, {key:'entrega',label:'Entrega'}, {key:'uf',label:'UF'}, {key:'revenda',label:'Revenda'}, {key:'status',label:'Status'}, {key:'ano',label:'Ano'} ];
+      const filterBar = mountFilters(container, [ {name:'revenda',label:'Revenda',type:'text'}, {name:'numero_pedido',label:'Nº Pedido',type:'text'}, {name:'entrega',label:'Entrega',type:'text'}, {name:'status',label:'Status',type:'text'}, {name:'ano',label:'Ano',type:'number'} ]);
+      async function query(){ try{ UI.showLoading(true); const f = Object.fromEntries([...filterBar.querySelectorAll('.field .input, .field .select')].map(i=>[i.name,i.value])); const filters=[]; if (f.revenda) filters.push(`revenda=ilike.*${encodeURIComponent(f.revenda)}*`); if (f.numero_pedido) filters.push(`numero_pedido=ilike.*${encodeURIComponent(f.numero_pedido)}*`); if (f.entrega) filters.push(`entrega=ilike.*${encodeURIComponent(f.entrega)}*`); if (f.status) filters.push(`status=ilike.*${encodeURIComponent(f.status)}*`); if (f.ano) filters.push(`ano=eq.${encodeURIComponent(f.ano)}`); const url = new URL(`${Config.supabaseUrl}/rest/v1/${Config.tables.pedidos}`); url.searchParams.set('select','*'); filters.forEach(x=> url.searchParams.append(x,'')); const res=await fetch(url.toString(), { headers:{'apikey':Config.supabaseAnonKey,'Authorization':`Bearer ${Config.supabaseAnonKey}`} }); if(!res.ok) throw new Error(await res.text()); const data=await res.json(); container.querySelectorAll('.table-wrapper').forEach(e=>e.remove()); renderTable(container, cols, data); } catch(err){ console.error(err); UI.showToast('Erro ao carregar pedidos','error'); } finally{ UI.showLoading(false); } }
+      filterBar.querySelector('[data-action="apply"]').addEventListener('click', query);
+      filterBar.querySelector('[data-action="clear"]').addEventListener('click', ()=> { filterBar.querySelectorAll('input,select').forEach(i=> i.value=''); query(); });
+      query();
+    }
+
+    function loadNovos(container){
+      container.innerHTML = '';
+      const wrapper = document.createElement('div'); wrapper.className='card';
+      wrapper.innerHTML = `
+        <div class="card-header"><div class="card-title">Novos Registros</div></div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+          <button class="btn" data-k="estoque">Estoque</button>
+          <button class="btn" data-k="vendas">Vendas</button>
+          <button class="btn" data-k="pedidos">Pedidos JCB</button>
+        </div>
+        <div id="formArea" class="grid" style="display:grid; gap:10px;"></div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:12px;">
+          <button class="btn outline" id="btnClear">Limpar</button>
+          <button class="btn success" id="btnSave">Salvar</button>
+        </div>`;
+      container.appendChild(wrapper);
+      const formArea = wrapper.querySelector('#formArea'); let current='estoque';
+      const fieldsMap = {
+        estoque: ['revenda','numero_pedido','serie','faturado_fabrica','cliente','qtde','modelo','nf_jcb','localizacao','dias_faturado_fabrica','frete','dealer_net','status_pagamento','ano','data_retirada_fabrica','previsao_chegada','chegada_patio','dias_no_patio','data_venda','data_et','status_pdi'],
+        vendas: ['revenda','numero_pedido','serie','data_venda','cliente','qtde','modelo','nf_jcb','localizacao','dias_no_patio','frete_sp_pe_ce','venda','status_pagamento'],
+        pedidos: ['numero_pedido','modelo','dealer_net','entrega','uf','revenda','status','ano']
+      };
+      function renderForm(kind){ current = kind; formArea.innerHTML = ''; fieldsMap[kind].forEach(name => { const div=document.createElement('div'); div.className='field'; const label = name.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()); div.innerHTML = `<label class="label">${label}</label><input class="input" name="${name}"/>`; formArea.appendChild(div); }); }
+      wrapper.querySelectorAll('button[data-k]').forEach(b => b.addEventListener('click', ()=> renderForm(b.dataset.k)));
+      wrapper.querySelector('#btnClear').addEventListener('click', ()=> formArea.querySelectorAll('input').forEach(i=> i.value=''));
+      wrapper.querySelector('#btnSave').addEventListener('click', async ()=>{
+        try{ UI.showLoading(true); const payload={}; formArea.querySelectorAll('input').forEach(i=> payload[i.name] = i.value || null); const map={estoque:Config.tables.estoque, vendas:Config.tables.vendas, pedidos:Config.tables.pedidos}; const res = await fetch(`${Config.supabaseUrl}/rest/v1/${map[current]}`, { method:'POST', headers: headersJSON(), body: JSON.stringify(payload) }); if (!res.ok) throw new Error(await res.text()); UI.showToast('Registro salvo!','success'); formArea.querySelectorAll('input').forEach(i=> i.value=''); } catch(err) { console.error(err); UI.showToast('Falha ao salvar','error'); } finally { UI.showLoading(false); }
+      });
+      renderForm('estoque');
+    }
+
+    function wireComercial(){
+      const esto = document.getElementById('comercial-estoque');
+      const ven = document.getElementById('comercial-vendas');
+      const ped = document.getElementById('comercial-pedidos');
+      const nov = document.getElementById('comercial-novos');
+      const section = esto.closest('[data-tabs]');
+      section.addEventListener('tabchange', (e)=>{ if (e.detail.tab==='estoque') loadEstoque(esto); if (e.detail.tab==='vendas') loadVendas(ven); if (e.detail.tab==='pedidos') loadPedidos(ped); if (e.detail.tab==='novos') loadNovos(nov); });
+    }
+
+    // ===== Pós-Vendas Views =====
+    async function loadPDI(container){
+      container.innerHTML = '';
+      const filter = document.createElement('div'); filter.className='card filters';
+      filter.innerHTML = `
+        <div class=\"field\"><label class=\"label\">Revenda</label><input class=\"input\" name=\"revenda\"></div>
+        <div class=\"field\"><label class=\"label\">Nº Pedido</label><input class=\"input\" name=\"numero_pedido\"></div>
+        <div class=\"field\"><label class=\"label\">PDI</label><select class=\"select\" name=\"status_pdi\"><option value=\"\">Todos</option><option>Sim</option><option>Não</option></select></div>
+        <div class=\"field\"><label class=\"label\">Cliente</label><input class=\"input\" name=\"cliente\"></div>
+        <div class=\"field\"><label class=\"label\">Série</label><input class=\"input\" name=\"serie\"></div>
+        <div class=\"actions\"><button class=\"btn outline\" data-clear>Limpar</button><button class=\"btn\" data-apply>Filtrar</button></div>`;
+      container.appendChild(filter);
+      const tableCtn = document.createElement('div'); container.appendChild(tableCtn);
+      async function query(){ try{ UI.showLoading(true); const f = Object.fromEntries([...filter.querySelectorAll('.input,.select')].map(i=>[i.name,i.value])); const fil=[]; if(f.revenda) fil.push(`revenda=ilike.*${encodeURIComponent(f.revenda)}*`); if(f.numero_pedido) fil.push(`numero_pedido=ilike.*${encodeURIComponent(f.numero_pedido)}*`); if(f.status_pdi) fil.push(`status_pdi=eq.${encodeURIComponent(f.status_pdi)}`); if(f.cliente) fil.push(`cliente=ilike.*${encodeURIComponent(f.cliente)}*`); if(f.serie) fil.push(`serie=ilike.*${encodeURIComponent(f.serie)}*`); const url=new URL(`${Config.supabaseUrl}/rest/v1/${Config.tables.pdi}`); url.searchParams.set('select','*'); fil.forEach(x=> url.searchParams.append(x,'')); const res=await fetch(url.toString(), { headers:{'apikey':Config.supabaseAnonKey,'Authorization':`Bearer ${Config.supabaseAnonKey}`} }); if(!res.ok) throw new Error(await res.text()); const data=await res.json(); tableCtn.innerHTML=''; const wrap=document.createElement('div'); wrap.className='table-wrapper'; const table=document.createElement('table'); table.className='table'; table.innerHTML=`<thead><tr><th>Revenda</th><th>Nº Pedido</th><th>Série</th><th>Modelo</th><th>Cliente</th><th>Data Maq. Patio</th><th>Status PDI</th></tr></thead><tbody></tbody>`; const tb=table.querySelector('tbody'); data.forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${r.revenda||''}</td><td>${r.numero_pedido||''}</td><td>${r.serie||''}</td><td>${r.modelo||''}</td><td>${r.cliente||''}</td><td>${r.data_maq_patio||''}</td><td><span class=\"badge ${r.status_pdi==='Sim'?'success':r.status_pdi==='Não'?'warning':'info'}\">${r.status_pdi||'—'}</span></td>`; tb.appendChild(tr); }); wrap.appendChild(table); tableCtn.appendChild(wrap); const actions=document.createElement('div'); actions.style='margin-top:12px; display:flex; justify-content:flex-end;'; actions.innerHTML = `<button class=\"btn\" id=\"btnAjustePDI\"><i class=\"fa-solid fa-sliders\"></i> Ajustar PDI</button>`; tableCtn.appendChild(actions); document.getElementById('btnAjustePDI').addEventListener('click', ()=> openAdjustPDI()); } catch(err){ console.error(err); UI.showToast('Erro ao carregar PDI','error'); } finally { UI.showLoading(false); } }
+      filter.querySelector('[data-apply]').addEventListener('click', query); filter.querySelector('[data-clear]').addEventListener('click', ()=> { filter.querySelectorAll('input,select').forEach(i=> i.value=''); query(); }); query();
+      function openAdjustPDI(){ const overlay=document.createElement('div'); overlay.className='modal-overlay'; overlay.innerHTML=`<div class=\"modal open\"><div class=\"modal-header\"><div class=\"card-title\">Ajuste de Status PDI</div><button class=\"btn outline\" data-close>&times;</button></div><div class=\"modal-body\"><div class=\"field\"><label class=\"label\">Nº Pedido</label><input class=\"input\" name=\"numero_pedido\"></div><div class=\"field\"><label class=\"label\">Status PDI</label><select class=\"select\" name=\"status_pdi\"><option>Não</option><option>Sim</option></select></div></div><div class=\"modal-footer\"><button class=\"btn outline\" data-close>Cancelar</button><button class=\"btn success\" data-save>Salvar</button></div></div>`; document.body.appendChild(overlay); overlay.querySelectorAll('[data-close]').forEach(b=> b.addEventListener('click', ()=> overlay.remove())); overlay.querySelector('[data-save]').addEventListener('click', async ()=>{ const np=overlay.querySelector('input[name="numero_pedido"]').value?.trim(); const spdi=overlay.querySelector('select[name="status_pdi"]').value; if(!np){ UI.showToast('Informe o Nº Pedido','warning'); return; } try{ UI.showLoading(true); const url=`${Config.supabaseUrl}/rest/v1/${Config.tables.pdi}?numero_pedido=eq.${encodeURIComponent(np)}`; const res=await fetch(url, { method:'PATCH', headers: headersJSON(), body: JSON.stringify({ status_pdi: spdi }) }); if(!res.ok) throw new Error(await res.text()); const url2=`${Config.supabaseUrl}/rest/v1/${Config.tables.estoque}?numero_pedido=eq.${encodeURIComponent(np)}`; await fetch(url2, { method:'PATCH', headers: headersJSON(), body: JSON.stringify({ status_pdi: spdi }) }); UI.showToast('PDI atualizado!','success'); overlay.remove(); query(); } catch(err){ console.error(err); UI.showToast('Falha ao atualizar PDI','error'); } finally { UI.showLoading(false); } }); }
+    }
+
+    async function loadEntrega(container){
+      container.innerHTML = '';
+      const filter=document.createElement('div'); filter.className='card filters'; filter.innerHTML=`<div class=\"field\"><label class=\"label\">Revenda</label><input class=\"input\" name=\"revenda\"></div><div class=\"field\"><label class=\"label\">Nº Pedido</label><input class=\"input\" name=\"numero_pedido\"></div><div class=\"field\"><label class=\"label\">Série</label><input class=\"input\" name=\"serie\"></div><div class=\"field\"><label class=\"label\">Modelo</label><input class=\"input\" name=\"modelo\"></div><div class=\"field\"><label class=\"label\">Cliente</label><input class=\"input\" name=\"cliente\"></div><div class=\"field\"><label class=\"label\">Status Entrega</label><select class=\"select\" name=\"status_entrega\"><option value=\"\">Todos</option><option>Feito</option><option>Pendente</option></select></div><div class=\"actions\"><button class=\"btn outline\" data-clear>Limpar</button><button class=\"btn\" data-apply>Filtrar</button></div>`; container.appendChild(filter); const tableCtn=document.createElement('div'); container.appendChild(tableCtn);
+      async function query(){ try{ UI.showLoading(true); const f=Object.fromEntries([...filter.querySelectorAll('.input,.select')].map(i=>[i.name,i.value])); const fil=[]; if(f.revenda) fil.push(`revenda=ilike.*${encodeURIComponent(f.revenda)}*`); if(f.numero_pedido) fil.push(`numero_pedido=ilike.*${encodeURIComponent(f.numero_pedido)}*`); if(f.serie) fil.push(`serie=ilike.*${encodeURIComponent(f.serie)}*`); if(f.modelo) fil.push(`modelo=ilike.*${encodeURIComponent(f.modelo)}*`); if(f.cliente) fil.push(`cliente=ilike.*${encodeURIComponent(f.cliente)}*`); if(f.status_entrega) fil.push(`status_entrega=eq.${encodeURIComponent(f.status_entrega)}`); const url = new URL(`${Config.supabaseUrl}/rest/v1/${Config.tables.entrega}`); url.searchParams.set('select','*'); fil.forEach(x=> url.searchParams.append(x,'')); const res=await fetch(url.toString(), { headers:{'apikey':Config.supabaseAnonKey,'Authorization':`Bearer ${Config.supabaseAnonKey}`} }); if(!res.ok) throw new Error(await res.text()); const data=await res.json(); tableCtn.innerHTML=''; const wrap=document.createElement('div'); wrap.className='table-wrapper'; const table=document.createElement('table'); table.className='table'; table.innerHTML=`<thead><tr><th>Revenda</th><th>Nº Pedido</th><th>Série</th><th>Modelo</th><th>Cliente</th><th>Status Entrega</th><th>Data Programação</th><th>Data Reprogramação</th><th>Motivo Reprogramação</th></tr></thead><tbody></tbody>`; const tb=table.querySelector('tbody'); data.forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${r.revenda||''}</td><td>${r.numero_pedido||''}</td><td>${r.serie||''}</td><td>${r.modelo||''}</td><td>${r.cliente||''}</td><td><span class=\"badge ${r.status_entrega==='Feito'?'success':r.status_entrega==='Pendente'?'warning':'info'}\">${r.status_entrega||'—'}</span></td><td>${r.data_programacao||''}</td><td>${r.data_reprogramacao||''}</td><td>${r.motivo_reprogramacao||''}</td>`; tb.appendChild(tr); }); wrap.appendChild(table); tableCtn.appendChild(wrap); const actions=document.createElement('div'); actions.style='margin-top:12px; display:flex; justify-content:flex-end; gap:8px;'; actions.innerHTML=`<button class=\"btn\" id=\"btnAjusteEntrega\"><i class=\"fa-solid fa-sliders\"></i> Ajustar Entrega</button><button class=\"btn outline\" id=\"btnProgEntrega\"><i class=\"fa-solid fa-calendar\"></i> Programar/Reprogramar</button>`; tableCtn.appendChild(actions); document.getElementById('btnAjusteEntrega').addEventListener('click', ()=> openAdjustEntrega()); document.getElementById('btnProgEntrega').addEventListener('click', ()=> openProgEntrega()); } catch(err){ console.error(err); UI.showToast('Erro ao carregar Entrega Técnica','error'); } finally { UI.showLoading(false); } }
+      filter.querySelector('[data-apply]').addEventListener('click', query); filter.querySelector('[data-clear]').addEventListener('click', ()=> { filter.querySelectorAll('input,select').forEach(i=> i.value=''); query(); }); query();
+      function openAdjustEntrega(){ const overlay=document.createElement('div'); overlay.className='modal-overlay'; overlay.innerHTML=`<div class=\"modal open\"><div class=\"modal-header\"><div class=\"card-title\">Ajuste de Status Entrega</div><button class=\"btn outline\" data-close>&times;</button></div><div class=\"modal-body\"><div class=\"field\"><label class=\"label\">Nº Pedido</label><input class=\"input\" name=\"numero_pedido\"></div><div class=\"field\"><label class=\"label\">Status Entrega</label><select class=\"select\" name=\"status_entrega\"><option>Pendente</option><option>Feito</option></select></div></div><div class=\"modal-footer\"><button class=\"btn outline\" data-close>Cancelar</button><button class=\"btn success\" data-save>Salvar</button></div></div>`; document.body.appendChild(overlay); overlay.querySelectorAll('[data-close]').forEach(b=> b.addEventListener('click', ()=> overlay.remove())); overlay.querySelector('[data-save]').addEventListener('click', async ()=>{ const np=overlay.querySelector('input[name="numero_pedido"]').value?.trim(); const st=overlay.querySelector('select[name="status_entrega"]').value; if(!np){ UI.showToast('Informe o Nº Pedido','warning'); return; } try{ UI.showLoading(true); const url=`${Config.supabaseUrl}/rest/v1/${Config.tables.entrega}?numero_pedido=eq.${encodeURIComponent(np)}`; const res=await fetch(url, { method:'PATCH', headers: headersJSON(), body: JSON.stringify({ status_entrega: st }) }); if (!res.ok) throw new Error(await res.text()); const url2=`${Config.supabaseUrl}/rest/v1/${Config.tables.estoque}?numero_pedido=eq.${encodeURIComponent(np)}`; await fetch(url2, { method:'PATCH', headers: headersJSON(), body: JSON.stringify({ status_entrega_tecnica: st }) }); UI.showToast('Entrega atualizada!','success'); overlay.remove(); query(); } catch(err){ console.error(err); UI.showToast('Falha ao atualizar Entrega','error'); } finally { UI.showLoading(false); } }); }
+      function openProgEntrega(){ const overlay=document.createElement('div'); overlay.className='modal-overlay'; overlay.innerHTML=`<div class=\"modal open\"><div class=\"modal-header\"><div class=\"card-title\">Programação/Reprogramação</div><button class=\"btn outline\" data-close>&times;</button></div><div class=\"modal-body\"><div class=\"field\"><label class=\"label\">Nº Pedido</label><input class=\"input\" name=\"numero_pedido\"></div><div class=\"field\"><label class=\"label\">Data Programação</label><input class=\"input\" type=\"date\" name=\"data_programacao\"></div><div class=\"field\"><label class=\"label\">Data Reprogramação</label><input class=\"input\" type=\"date\" name=\"data_reprogramacao\"></div><div class=\"field\"><label class=\"label\">Motivo Reprogramação</label><input class=\"input\" name=\"motivo_reprogramacao\"></div></div><div class=\"modal-footer\"><button class=\"btn outline\" data-close>Cancelar</button><button class=\"btn success\" data-save>Salvar</button></div></div>`; document.body.appendChild(overlay); overlay.querySelectorAll('[data-close]').forEach(b=> b.addEventListener('click', ()=> overlay.remove())); overlay.querySelector('[data-save]').addEventListener('click', async ()=>{ const np=overlay.querySelector('input[name="numero_pedido"]').value?.trim(); const dp=overlay.querySelector('input[name="data_programacao"]').value||null; const dr=overlay.querySelector('input[name="data_reprogramacao"]').value||null; const motivo=overlay.querySelector('input[name="motivo_reprogramacao"]').value||null; if(!np){ UI.showToast('Informe o Nº Pedido','warning'); return; } try{ UI.showLoading(true); const url=`${Config.supabaseUrl}/rest/v1/${Config.tables.entrega}?numero_pedido=eq.${encodeURIComponent(np)}`; const res=await fetch(url, { method:'PATCH', headers: headersJSON(), body: JSON.stringify({ data_programacao: dp, data_reprogramacao: dr, motivo_reprogramacao: motivo }) }); if(!res.ok) throw new Error(await res.text()); UI.showToast('Programação salva!','success'); overlay.remove(); query(); } catch(err){ console.error(err); UI.showToast('Falha ao salvar programação','error'); } finally { UI.showLoading(false); } }); }
+    }
+
+    function wirePOS(){
+      const pdi = document.getElementById('pos-pdi');
+      const ent = document.getElementById('pos-entrega');
+      const section = pdi.closest('[data-tabs]');
+      section.addEventListener('tabchange', (e)=>{ if (e.detail.tab==='pdi') loadPDI(pdi); if (e.detail.tab==='entrega') loadEntrega(ent); });
+    }
+
+    // ===== Admin Views =====
+    async function loadUsers(container){
+      container.innerHTML=''; const card=document.createElement('div'); card.className='card';
+      card.innerHTML = `
+        <div class=\"card-header\"><div class=\"card-title\">Usuários</div></div>
+        <div class=\"grid\" style=\"display:grid; gap:10px; grid-template-columns: repeat(2, minmax(0,1fr));\">
+          <div class=\"field\"><label class=\"label\">Nome Completo</label><input class=\"input\" name=\"nome\"></div>
+          <div class=\"field\"><label class=\"label\">E-mail</label><input class=\"input\" type=\"email\" name=\"email\"></div>
+          <div class=\"field\"><label class=\"label\">Senha Temporária</label><input class=\"input\" name=\"senha_temporaria\"></div>
+          <div class=\"field\"><label class=\"label\">Tipo de Usuário</label><select class=\"select\" name=\"role\"><option value=\"usuario\">Usuario</option><option value=\"admin\">Administrador</option></select></div>
+          <div class=\"field\"><label class=\"label\">Setor</label><select class=\"select\" name=\"setor\"><option>Apenas Comercial</option><option>Apenas Pós-Vendas</option><option>Comercial e Pós-Vendas</option></select></div>
+        </div>
+        <div style=\"display:flex; justify-content:flex-end; gap:10px; margin-top:12px;\"><button class=\"btn outline\" data-clear>Limpar</button><button class=\"btn success\" data-save>Salvar</button></div>`;
+      container.appendChild(card);
+      card.querySelector('[data-clear]').addEventListener('click', ()=> card.querySelectorAll('input,select').forEach(i=> i.value=''));
+      card.querySelector('[data-save]').addEventListener('click', async ()=>{
+        const payload = Object.fromEntries([...card.querySelectorAll('input,select')].map(i=> [i.name, i.value]));
+        if (!payload.email || !payload.nome) { UI.showToast('Nome e e-mail são obrigatórios','warning'); return; }
+        try{ UI.showLoading(true); const res = await fetch(`${Config.supabaseUrl}/rest/v1/${Config.tables.usuarios}`, { method:'POST', headers: headersJSON(), body: JSON.stringify({ nome: payload.nome, email: payload.email, senha_temporaria: payload.senha_temporaria||null, senha_hash:null, role: payload.role, setor: payload.setor.toLowerCase().includes('pós') ? 'pós-vendas' : payload.setor.toLowerCase().includes('comercial e') ? 'ambos' : 'comercial', ativo: true }) }); if(!res.ok) throw new Error(await res.text()); UI.showToast('Usuário criado!','success'); card.querySelectorAll('input').forEach(i=> i.value=''); } catch(err){ console.error(err); UI.showToast('Falha ao criar usuário','error'); } finally { UI.showLoading(false); }
+      });
+    }
+
+    async function loadAlerts(container){
+      container.innerHTML=''; const card=document.createElement('div'); card.className='card';
+      card.innerHTML = `
+        <div class=\"card-header\"><div class=\"card-title\">Configurações de Alerta</div></div>
+        <div class=\"grid\" style=\"display:grid; gap:10px; grid-template-columns: repeat(2, minmax(0,1fr));\">
+          <div class=\"field\"><label class=\"label\">E-mail para Notificação</label><input class=\"input\" type=\"email\" name=\"email\"></div>
+          <div class=\"field\"><label class=\"label\">Tipo de Notificação</label><select class=\"select\" name=\"tipo\"><option value=\"ambos\">Ambos</option><option value=\"pdi\">PDI Pendente</option><option value=\"entrega\">Entrega Técnica Pendente</option></select></div>
+        </div>
+        <div style=\"display:flex; justify-content:flex-end; gap:10px; margin-top:12px;\"><button class=\"btn success\" data-add>Adicionar</button></div>
+        <div class=\"table-wrapper\" style=\"margin-top:12px;\"><table class=\"table\"><thead><tr><th>E-mail</th><th>Tipo</th></tr></thead><tbody></tbody></table></div>`;
+      container.appendChild(card);
+      const tbody = card.querySelector('tbody');
+      async function refreshList(){ tbody.innerHTML=''; try{ const url=new URL(`${Config.supabaseUrl}/rest/v1/${Config.tables.alertSettings}`); url.searchParams.set('select','*'); const res=await fetch(url.toString(), { headers:{'apikey':Config.supabaseAnonKey,'Authorization':`Bearer ${Config.supabaseAnonKey}`} }); if(!res.ok) throw new Error(await res.text()); const data=await res.json(); data.forEach(r=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${r.email}</td><td>${r.tipo}</td>`; tbody.appendChild(tr); }); } catch(err){ console.error(err); UI.showToast('Erro ao carregar alertas','error'); } }
+      card.querySelector('[data-add]').addEventListener('click', async ()=>{ const email=card.querySelector('input[name="email"]').value.trim(); const tipo=card.querySelector('select[name="tipo"]').value; if(!email){ UI.showToast('Informe o e-mail','warning'); return; } try{ UI.showLoading(true); const res=await fetch(`${Config.supabaseUrl}/rest/v1/${Config.tables.alertSettings}`, { method:'POST', headers: headersJSON(), body: JSON.stringify({ email, tipo }) }); if(!res.ok) throw new Error(await res.text()); UI.showToast('Alerta adicionado!','success'); card.querySelector('input[name="email"]').value=''; await refreshList(); } catch(err){ console.error(err); UI.showToast('Falha ao adicionar alerta','error'); } finally { UI.showLoading(false); } });
+      refreshList();
+    }
+
+    function wireAdmin(){ loadUsers(document.getElementById('admin-users')); loadAlerts(document.getElementById('admin-alerts')); }
+
+    // ===== Boot =====
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+    document.getElementById('registerLink').addEventListener('click', (e)=>{ e.preventDefault(); UI.showToast('Entre em contato com o administrador para solicitar acesso.','info'); });
+    document.getElementById('developerLink').addEventListener('click', (e)=>{ e.preventDefault(); UI.showToast('Contato do desenvolvedor: thiago.carmo@normaq.com.br','info'); });
+    document.querySelector('#changePasswordModal [data-close-change]')?.addEventListener('click', ()=> UI.closeModal(document.getElementById('changePasswordModal')));
+    document.getElementById('saveNewPassword').addEventListener('click', handleChangePassword);
+
+    const saved = loadSavedUser();
+    if (saved && saved.senha_temporaria === false) { AppState.currentUser = saved; showApp(); }
+    else { showLogin(); if (saved && saved.senha_temporaria) { AppState.currentUser = saved; showChangePassword(); } }
   </script>
 </body>
 </html>
